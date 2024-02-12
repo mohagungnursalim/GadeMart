@@ -26,7 +26,7 @@ Komoditas
             @endif
             
             <form class="form-inline" action="/dashboard/komoditas">
-                <input class="form-control mr-sm-2" type="search" name="search" placeholder="Search" aria-label="Search">
+                <input class="form-control mr-sm-2" value="{{request('search')}}" type="search" name="search" placeholder="Search" aria-label="Search">
                 <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
               </form>
             <table id="myTable" class="table table-bordered text-dark">
