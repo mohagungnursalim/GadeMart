@@ -20,8 +20,15 @@ class UserController extends Controller
         $user = User::where('id', '!=', $loggedInUser->id)->latest()->paginate(10);
 
         if (request('search')) {
-            $user = User::where('name', 'like', '%' . request('search') . '%')->where('id', '!=', $loggedInUser->id)->latest()->paginate(5);
-        } 
+            $user = User::where(function($query) {
+                            $query->where('name', 'like', '%' . request('search') . '%')
+                                  ->orWhere('email', 'like', '%' . request('search') . '%');
+                        })
+                        ->where('id', '!=', $loggedInUser->id)
+                        ->latest()
+                        ->paginate(5);
+        }
+        
 
         return view('dashboard.akun.index',[
             'pasars' => Pasar::all(),
