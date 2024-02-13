@@ -87,7 +87,9 @@ Aduan Pasar
                             <div class="mb-2 row">
                                 <label for="staticEmail" class=""><b>Lampiran Foto</b></label>
                                 <div class="col">
-                                    <input class="form-control" name="gambar" type="file">
+                                    <img  class="img-preview img-fluid mb-3 col-sm-5" style="width: 100px; height: 100px none">
+                                    <input onchange="previewImage()" id="image" type="file" value="{{ old('image') }}" class="form-control" name="gambar">
+                       
                                     @error('gambar')
                                             <small><p class="text-danger">{{ $message }}</p></small>
                                         @enderror
@@ -133,5 +135,27 @@ Aduan Pasar
     $(".alert").fadeTo(500, 0).slideUp(500, function(){
       $(this).remove(); 
     });
-  }, 3000);
+  }, 2000);
+</script>
+
+{{-- input image preview --}}
+<script>
+    function previewImage() {
+
+        const image = document.querySelector('#image');
+        const imgPreview = document.querySelector('.img-preview');
+
+        imgPreview.style.display = 'block';
+
+        const oFReader = new FileReader();
+
+        oFReader.readAsDataURL(image.files[0]);
+
+        oFReader.onload = function (oFREvent) {
+
+            imgPreview.src = oFREvent.target.result;
+
+        }
+    }
+
 </script>
