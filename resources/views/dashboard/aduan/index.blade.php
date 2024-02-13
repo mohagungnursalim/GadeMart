@@ -89,7 +89,9 @@ Aduan Masuk
 
             </table>
 
-            {{ $aduans->links() }}
+            <div class="d-flex justify-content-center">
+                {{ $aduans->links() }}
+            </div>
         </div>
 
 

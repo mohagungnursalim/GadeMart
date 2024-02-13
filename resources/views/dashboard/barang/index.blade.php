@@ -68,7 +68,9 @@ Barang
 
             </table>
 
-            {{ $barangs->links() }}
+            <div class="d-flex justify-content-center">
+                {{ $barangs->links() }}
+            </div>
         </div>
 
 

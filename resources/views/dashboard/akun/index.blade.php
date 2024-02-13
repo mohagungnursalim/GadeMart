@@ -142,7 +142,9 @@ Kelola Akun
                     @endif
                 </table>
             </div>
-            {{ $users->links() }}
+            <div class="d-flex justify-content-center">
+                {{ $users->links() }}
+            </div>
 
 
 

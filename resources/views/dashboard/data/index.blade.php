@@ -208,14 +208,12 @@ Tabel Harga
             
             
         </div>
-        <div class="container">
-            <div class="text-center">
-                {{ $pangans->links() }}
-            </div>
-    
-        </div>
         
+        <div class="d-flex justify-content-center">
+            {{ $pangans->links() }}
+        </div>
     </div>
+        
 </div>
 
 <!-- Modal Input Data -->

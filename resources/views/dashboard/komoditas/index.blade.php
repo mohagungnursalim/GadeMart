@@ -74,7 +74,9 @@ Komoditas
 
             </table>
 
-            {{ $komoditas->links() }}
+            <div class="d-flex justify-content-center">
+                {{ $komoditas->links() }}
+            </div>
         </div>
 
 
