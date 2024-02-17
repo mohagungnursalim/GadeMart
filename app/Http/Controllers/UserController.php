@@ -17,6 +17,7 @@ class UserController extends Controller
 
         $loggedInUser = auth()->user();
 
+        // menampilkan semua user,selain user yang login
         $user = User::where('id', '!=', $loggedInUser->id)->latest()->paginate(10);
 
         if (request('search')) {
