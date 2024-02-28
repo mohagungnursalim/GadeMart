@@ -35,59 +35,62 @@ Komoditas
                 </div>
             </form>
         </div>
-        <table class="table table-bordered table-hover table-condensed">
-            <tbody>
-                <tr>
-                    <th>NO</th>
-                    <th>KOMODITAS</th>
-                    <th>SATUAN</th>
-                    <th>HARGA LAMA</th>
-                    <th>HARGA SEKARANG</th>
-                    <th class="right">PERUBAHAN (Rp)</th>
-                    <th class="right">PERUBAHAN (%)</th>
-                </tr>
-    
-                @foreach ($komoditas as $kmd)
-                <tr>
-                    <td>{{$loop->iteration}}</td>
-                    <td>{{$kmd->nama}}</td>
-                    <td></td>
-                    <td></td>
-                    <td class="right sekarang"></td>
-                    <td class="right"></td>
-                    <td class="right"> <span class=""></span></td>
-                </tr>
-    
-                @foreach ($kmd->barangs as $barang)
-                @foreach ($barang->pangans as $pangan)
-                @if ($pangan->pasar === request('filter') || request('filter') == '')
-                <tr>
-                    <td></td>
-                    <td>- {{$barang->nama}}</td>
-                    <td>{{ $pangan->satuan }}</td>
-                    <td class="text-center">
-                      @if ($pangan->harga_sebelum)
-                          Rp{{number_format($pangan->harga_sebelum)}}
-                      @else
-                      -
-                      @endif
-                    </td>
-                    <td class="right sekarang text-center">
-                        Rp{{ number_format($pangan->harga) }}
-                    </td>
-                    <td class="right text-center">
-                      Rp{{ number_format($pangan->perubahan_rp) }} 
-                    </td>
-                    <td class="right text-center">
-                         {{ number_format($pangan->perubahan_persen) }}%{{$pangan->keterangan}}  
-                  </td>
-                </tr>
-                @endif
-                @endforeach
-                @endforeach
-                @endforeach
-            </tbody>
-        </table>
+        <div class="overflow-auto">
+            <table class="table table-bordered table-hover table-condensed">
+                <tbody>
+                    <tr>
+                        <th>NO</th>
+                        <th>KOMODITAS</th>
+                        <th>SATUAN</th>
+                        <th>HARGA LAMA</th>
+                        <th>HARGA SEKARANG</th>
+                        <th class="right">PERUBAHAN (Rp)</th>
+                        <th class="right">PERUBAHAN (%)</th>
+                    </tr>
+        
+                    @foreach ($komoditas as $kmd)
+                    <tr>
+                        <td>{{$loop->iteration}}</td>
+                        <td>{{$kmd->nama}}</td>
+                        <td></td>
+                        <td></td>
+                        <td class="right sekarang"></td>
+                        <td class="right"></td>
+                        <td class="right"> <span class=""></span></td>
+                    </tr>
+        
+                    @foreach ($kmd->barangs as $barang)
+                    @foreach ($barang->pangans as $pangan)
+                    @if ($pangan->pasar === request('filter') || request('filter') == '')
+                    <tr>
+                        <td></td>
+                        <td>- {{$barang->nama}}</td>
+                        <td>{{ $pangan->satuan }}</td>
+                        <td class="text-center">
+                          @if ($pangan->harga_sebelum)
+                              Rp{{number_format($pangan->harga_sebelum)}}
+                          @else
+                          -
+                          @endif
+                        </td>
+                        <td class="right sekarang text-center">
+                            Rp{{ number_format($pangan->harga) }}
+                        </td>
+                        <td class="right text-center">
+                          Rp{{ number_format($pangan->perubahan_rp) }} 
+                        </td>
+                        <td class="right text-center">
+                             {{ number_format($pangan->perubahan_persen) }}%{{$pangan->keterangan}}  
+                      </td>
+                    </tr>
+                    @endif
+                    @endforeach
+                    @endforeach
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+        
     </div>
     
     </section>

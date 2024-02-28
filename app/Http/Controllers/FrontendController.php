@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Komoditas;
 use Illuminate\Http\Request;
 use App\Models\Pangan;
+use Illuminate\Support\Facades\DB;
 use App\Models\Barang;
 use App\Models\Pasar;
 use Illuminate\Support\Carbon;
@@ -17,8 +18,8 @@ class FrontendController extends Controller
     public function index()
     {
 
+            $barangs = Barang::with('pangans')->latest()->paginate(20);
 
-        $barangs = Barang::with('pangans')->latest()->get();
 
         return view('index',compact('barangs'));
     }

@@ -14,7 +14,7 @@
     --}}
     <br>
     <div class="text-center text-dark mt-2">
-        <h2><b>Harga Pangan</b></h2>
+        <h2><b>Harga Barang Kebutuhan Pokok dan Barang Penting</b></h2>
     </div>
     <section id="harga" class="harga">
 
@@ -24,15 +24,12 @@
             <div class="d-flex justify-content-center">
                 <form action="/" method="get">
                     <div class="row g-3 align-items-center mb-2">
-                        {{-- <div class="col-auto">
-                          <label  class="col-form-label">Search Data</label>
-                        </div> --}}
                         <div class="col-auto">
                             <input type="text" value="{{request('filter')}}" class="form-control"
                                 placeholder="Kata Kunci.." name="filter">
                         </div>
                         <div class="col-auto">
-                            <button class="btn btn-primary" type="submit">Filter</button>
+                            <button class="btn btn-primary" type="submit">Cari</button>
 
                         </div>
                     </div>
@@ -42,6 +39,8 @@
             <div class="overflow-auto">
                 <div class="col-md-8">
                     <div class="card-body">
+
+
                         <div class="row d-flex flex-wrap">
                             @foreach ($barangs as $barang)
                             <div class="col-md-3">
@@ -51,8 +50,9 @@
                                     <div class="card-body align-items-center">
                                         <h5 class="card-title">{{ $barang->nama }}</h5>
                                         @if ($barang->pangans->isNotEmpty())
-                                        <p class="card-text">Harga:
-                                            Rp{{ number_format($barang->pangans->last()->harga) }}</p>
+                                        <p class="card-text">Harga rata-rata:
+                                            Rp{{ number_format($barang->pangans->avg('harga')) }}
+                                        </p>
                                         @else
                                         <p class="card-text">Harga tidak tersedia</p>
                                         @endif
@@ -60,8 +60,6 @@
                                 </div>
                             </div>
                             @endforeach
-
-
                         </div>
                     </div>
 
@@ -69,7 +67,7 @@
             </div>
 
             <div class="d-flex justify-content-center">
-                {{-- {{ $pangans->links() }} --}}
+                {{$barangs->links()}}
             </div>
 
         </div>
