@@ -14,6 +14,7 @@ use DataTables;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use App\Exports\TabelHargaExport;
+use App\Models\Aduan;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\Console\Input\Input;
@@ -271,9 +272,9 @@ class PanganController extends Controller
         $satuan = Satuan::count();
         $barang = Barang::count();
         $pasar = Pasar::count();
-        
-
-        return view('dashboard.dashboard',compact('pangan','komoditas','user','pasar','satuan','barang'));
+        $aduan = Aduan::count();
+                
+        return view('dashboard.dashboard',compact('pangan','komoditas','user','pasar','satuan','barang','aduan'));
     }
 
     public function export(Request $request)
