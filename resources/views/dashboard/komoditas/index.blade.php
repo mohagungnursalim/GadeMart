@@ -11,7 +11,7 @@ Komoditas
 <div class="card shadow mt-4">
     <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
         <!-- Button trigger modal -->
-        
+
 
     </div>
     <div class="card-body">
@@ -20,15 +20,17 @@ Komoditas
             @if (auth()->user()->operator == 'hanyalihat')
 
             @else
-            <button type="button" class="btn btn-primary mb-3" style="background-color: rgb(195, 0, 255); border:0ch" data-toggle="modal" data-target="#inputModal">
+            <button type="button" class="btn btn-primary mb-3" style="background-color: rgb(195, 0, 255); border:0ch"
+                data-toggle="modal" data-target="#inputModal">
                 Tambah komoditas
             </button>
             @endif
-            
+
             <form class="form-inline" action="/dashboard/komoditas">
-                <input class="form-control mr-sm-2" value="{{request('search')}}" type="search" name="search" placeholder="Search" aria-label="Search">
+                <input class="form-control mr-sm-2" value="{{request('search')}}" type="search" name="search"
+                    placeholder="Search" aria-label="Search">
                 <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-              </form>
+            </form>
             <table id="myTable" class="table table-bordered text-dark">
                 <tr>
                     <th>No</th>
@@ -40,7 +42,7 @@ Komoditas
                     @else
                     <th>Aksi</th>
                     @endif
-                    
+
 
                 </tr>
                 @foreach ($komoditas as $k )
@@ -68,7 +70,7 @@ Komoditas
                         --}}
                     </td>
                     @endif
-                    
+
                 </tr>
                 @endforeach
 
@@ -115,8 +117,9 @@ Komoditas
                     </div>
                     <div class="form-group">
                         <label for="formGroupExampleInput">Gambar</label>
-                        <img  class="img-preview img-fluid mb-3 col-sm-5" width="140px">
-                        <input onchange="previewImage()" id="image" type="file" value="{{ old('image') }}" class="form-control" name="image" id="formGroupExampleInput">
+                        <img class="img-preview img-fluid mb-3 col-sm-5" width="140px">
+                        <input onchange="previewImage()" id="image" type="file" value="{{ old('image') }}"
+                            class="form-control" name="image" id="formGroupExampleInput">
                         @error('image')
                         <span class="text-danger">{{ $message }}</span>
                         @enderror
@@ -153,21 +156,23 @@ Komoditas
                     @method('put')
                     <div class="form-group">
                         <label for="formGroupExampleInput">Komoditas</label>
-                        <input type="text" required class="form-control" value="{{ old('nama' ,$kmd->nama) }}" name="nama"
-                            id="formGroupExampleInput" placeholder="Masukan Data..">
+                        <input type="text" required class="form-control" value="{{ old('nama' ,$kmd->nama) }}"
+                            name="nama" id="formGroupExampleInput" placeholder="Masukan Data..">
 
                         @error('nama')
                         <span class="text-danger">{{ $message }}</span>
                         @enderror
                     </div>
                     <div class="form-group">
-                        <label for="formGroupExampleInput">Gambar</label>
+                        <label for="editimage">Gambar</label>
                         @if($kmd->image)
-                        <img src="{{ asset('storage/' .$kmd->image) }}" class="img-preview img-fluid mb-3 col-sm-5 d-block">
+                        <img src="{{ asset('storage/' .$kmd->image) }}"
+                            class="img-preview img-fluid mb-3 col-sm-5 d-block" id="edit-preview">
                         @else
-                        <img class="edit-preview img-fluid mb-3 col-sm-5">
+                        <img src="#" class="img-preview img-fluid mb-3 col-sm-5 d-none" id="edit-preview">
                         @endif
-                        <input onchange="editImage()" id="image" type="file" required class="form-control" value="{{ $kmd->image }}" name="image" id="editimage">
+                        <input onchange="editImage()" id="editimage" type="file" class="form-control" name="image"
+                            accept="image/*">
 
                         @error('image')
                         <span class="text-danger">{{ $message }}</span>
@@ -222,14 +227,16 @@ Komoditas
 
 <!-- Tambahkan kode jQuery untuk membuka modal -->
 @if ($errors->any())
-    <script>
-        $(document).ready(function() {
-            $('#inputModal').modal('show');
-        });
-    </script>
+<script>
+    $(document).ready(function () {
+        $('#inputModal').modal('show');
+    });
+
+</script>
 @endif
 
-{{-- input image preview --}}
+
+{{-- input image preciew --}}
 <script>
     function previewImage() {
 
@@ -251,24 +258,21 @@ Komoditas
 
 </script>
 
-{{-- edit image preciew --}}
+{{-- edit image preview --}}
 <script>
     function editImage() {
-
         const image = document.querySelector('#editimage');
-        const editPreview = document.querySelector('.edit-preview');
+        const editPreview = document.querySelector('#edit-preview');
 
-        editPreview.style.display = 'block';
+        const file = image.files[0];
+        const reader = new FileReader();
 
-        const oFReader = new FileReader();
-
-        oFReader.readAsDataURL(image.files[0]);
-
-        oFReader.onload = function (oFREvent) {
-
-            editPreview.src = oFREvent.target.result;
-
+        reader.onload = function (e) {
+            editPreview.src = e.target.result;
+            editPreview.classList.remove('d-none'); // Tampilkan gambar preview
         }
+
+        reader.readAsDataURL(file);
     }
 
 </script>

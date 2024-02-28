@@ -13,7 +13,7 @@ use Alert;
 use DataTables;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use App\Exports\DataTableExport;
+use App\Exports\TabelHargaExport;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\Auth;
 use Symfony\Component\Console\Input\Input;
@@ -25,52 +25,37 @@ class PanganController extends Controller
      */
     public function index()
     {
-        // -----------------------------------------------
         
-        // Post::with('category')->get();
-        $komoditas = Komoditas::select('nama')->latest()->get();
         $pasar = Pasar::select('nama')->latest()->get();
         $satuan = Satuan::select('nama')->oldest()->get();
-        $barangs = Barang::select('nama')->latest()->get();
-        
+        $barangs = Barang::select('nama','id')->oldest()->get();
 
-        if (auth()->user()->is_admin == true) {
-            $pangan = Pangan::latest()->paginate(8);
+        if (Auth::user()->is_admin == true) {
+            // filter pasar berdasarka
+                $selectedPasar = request('filter');
+                if ($selectedPasar) {
+                    // Ambil data komoditas dengan relasi barangs.pangans dan filter berdasarkan pasar yang difilter
+                    $komoditas = Komoditas::with(['barangs.pangans' => function ($query) use ($selectedPasar) {
+                        $query->where('pasar', $selectedPasar);
+                    }])->latest()->get();
+                }else {
+                     // data harga default yang ditampilkan adalah harga inpres manonda.
+                    $komoditas = Komoditas::with(['barangs.pangans' => function ($query) {
+                        $query->where('pasar', 'Pasar Inpres Manonda');
+                    }])->latest()->get();
+                }
         }else {
-            
-            $pangan = Pangan::where('user_id', auth()->user()->id)->latest()->paginate(10);
-        }
-
-        if (auth()->user()->is_admin == true) {
-            if (request('periode')){
-                $pangan =  Pangan::where('periode', 'like', '%' . request('periode') . '%')->paginate(10);
-            }
-            if (request('komoditas')){
-                $pangan =  Pangan::where('komoditas', 'like', '%' . request('komoditas') . '%')->latest()->paginate(10);
-            }
-            if (request('pasar')){
-                $pangan =  Pangan::where('pasar', 'like', '%' . request('pasar') . '%')->paginate(10);
-            }
-        }else {
-            
-            if (request('periode')){
-                $pangan =  Pangan::where('periode', 'like', '%' . request('periode') . '%')->where('user_id', auth()->user()->id)->latest()->paginate(10);
-            }
-            if (request('komoditas')){
-                $pangan =  Pangan::where('komoditas', 'like', '%' . request('komoditas') . '%')->where('user_id', auth()->user()->id)->paginate(10);
-            }
-            if (request('pasar')){
-                $pangan =  Pangan::where('pasar', 'like', '%' . request('pasar') . '%')->where('user_id', auth()->user()->id)->paginate(10);
-            }
+                $komoditas = Komoditas::with(['barangs.pangans' => function ($query) {
+                    $query->where('pasar', Auth::user()->operator);
+                }])->latest()->get(); 
         }
 
 
         return view('dashboard.data.index',[
-            'pangans' => $pangan,
-            'komoditas' => $komoditas,
             'pasars' => $pasar,
-            'satuans' => $satuan,
-            'barangs' => $barangs
+            'barangs' => $barangs,
+            'komoditas' =>$komoditas,
+            'satuans' => $satuan
         ]);
     }
    
@@ -101,55 +86,87 @@ class PanganController extends Controller
         // validasi input
         $request->validate([
             'pasar' => 'required|exists:pasars,nama',
-            'komoditas' => 'required|exists:komoditas,nama',
+            'komoditas_id' => 'required|exists:komoditas,id',
             'satuan' => 'required|exists:satuans,nama',
-            'jenis_barang' => 'required|exists:barangs,nama',
+            'barang_id' => 'required|exists:barangs,id',
             'harga' => 'required',
             'periode' => 'required'
         ],$messages);
 
         
-        $komoditas = $request->input('komoditas');
+        $komoditas_id = $request->input('komoditas_id');
         $pasar = $request->input('pasar');
         $user_id = $request['user_id'] = auth()->user()->id;
         $satuan = $request->input('satuan');
-        $jenis_barang = $request->input('jenis_barang');
+        $barang_id = $request->input('barang_id');
         $periode = $request->input('periode');
         $harga_sebelum = $request->input('harga_sebelum');
         $harga_terkini = $request->input('harga');
         
-        // Membandingkan harga
-    
-    if (isset($harga_sebelum)) {
-        if ($harga_terkini > $harga_sebelum ) {
-            $keterangan = 'Naik';
-        } elseif ($harga_terkini < $harga_sebelum) {
-            $keterangan = 'Turun';
-        } elseif ($harga_terkini == $harga_sebelum) {
-            $keterangan = 'Tetap';
-        } 
-    } else {
-        $keterangan = 'Tetap' ;
-    }
+       // Mengecek apakah ada data dengan jenis barang yang sama
+        $existingData = Pangan::where('barang_id', $barang_id)
+        ->where('pasar', $pasar)
+        ->exists();
+
+        // Jika data sudah ada, tampilkan pesan error
+        if ($existingData) {
+
+            $request->session(Alert::error('Oops..', 'Hanya boleh sekali input pada barang yang sama'));
+            return redirect()->back();
+        }
+
+
+        // Membandingkan harga sehingga menjadi keterangan
+        if (isset($harga_sebelum)) {
+            if ($harga_terkini > $harga_sebelum ) {
+                $keterangan = '⬆️';
+            } elseif ($harga_terkini < $harga_sebelum) {
+                $keterangan = '⬇️';
+            } elseif ($harga_terkini == $harga_sebelum) {
+                $keterangan = '➖';
+            } 
+        } else {
+        $keterangan = '➖' ;
+         }
+
+        // mencari selisih kenaikan/penurunan dari harga sebelumnya
+        if ($harga_terkini > $harga_sebelum) 
+        {
+            $perubahan_rp = $harga_terkini - $harga_sebelum;
+        }elseif ($harga_terkini < $harga_sebelum) 
+        {
+            $perubahan_rp = $harga_sebelum - $harga_terkini;
+        }else{
+            $perubahan_rp = 0;
+        }
         
+        if ($harga_sebelum) 
+        {
+            $perubahan = $harga_terkini - $harga_sebelum;
+            $perubahan_persen = ($perubahan / $harga_sebelum) * 100;
+        }
+
        
 
         $data = new Pangan();
 
         
         $data->user_id  = $user_id;
-        $data->komoditas = $komoditas;
+        $data->komoditas_id = $komoditas_id;
         $data->pasar = $pasar;
         $data->satuan = $satuan;
-        $data->jenis_barang = $jenis_barang;
+        $data->barang_id = $barang_id;
         $data->periode = $periode;
         $data->harga_sebelum = $harga_sebelum;
         $data->harga = $harga_terkini;
+        $data->perubahan_rp = $perubahan_rp;
+        $data->perubahan_persen = $perubahan_persen;
         $data->keterangan = $keterangan;
 
         // Pangan::create($data);
 
         // dd($data);
+        
         $data->save();
 
         $request->session(Alert::success('success', 'Data berhasil terinput!'));
@@ -184,7 +201,7 @@ class PanganController extends Controller
         $pasar = $request->input('pasar');
         $user_id = $request['user_id'] = auth()->user()->id;
         $satuan = $request->input('satuan');
-        $jenis_barang = $request->input('jenis_barang');
+        $barang_id = $request->input('barang_id');
         $periode = $request->input('periode');
         $harga_sebelum = $request->input('harga_sebelum');
         $harga_terkini = $request->input('harga');
@@ -208,7 +225,7 @@ class PanganController extends Controller
         $pangan->user_id  = $user_id;
         $pangan->pasar = $pasar;
         $pangan->satuan = $satuan;
-        $pangan->jenis_barang = $jenis_barang;
+        $pangan->barang_id = $barang_id;
         $pangan->periode = $periode;
         $pangan->harga_sebelum = $harga_sebelum;
         $pangan->harga = $harga_terkini;
@@ -259,25 +276,13 @@ class PanganController extends Controller
         return view('dashboard.dashboard',compact('pangan','komoditas','user','pasar','satuan','barang'));
     }
 
-    public function export(Request $request, Pangan $pangan)
+    public function export(Request $request)
     {
-        
-        if (request('exporttanggal')) {
-            $pangan = Pangan::where('periode', 'like', '%' . request('exportperiode') . '%')->get();
-
-            return Excel::download(new DataTableExport($pangan), 'Daftar-harga.xlsx');
-       
-        }
+        $isAdmin = auth()->user()->is_admin;
+        $filter = $request->input('filter');
     
-        if (request('exportkomoditas')) {
-            $pangan = Pangan::where('komoditas', 'like', '%' . request('exportkomoditas') . '%')->get();
-
-            return Excel::download(new DataTableExport($pangan), 'Daftar-harga.xlsx');
-       
-        }
-    
-        return Excel::download(new DataTableExport(), 'Daftar-harga.xlsx');
-        
+        // Ekspor data harga ke dalam file Excel
+        return Excel::download(new TabelHargaExport($isAdmin, $filter), 'Daftar-Harga.xlsx');
     }
 
 

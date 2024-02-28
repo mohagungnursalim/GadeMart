@@ -10,12 +10,12 @@ class Komoditas extends Model
     use HasFactory;
     protected $table = 'komoditas';
     // protected $guarded = ['id'];
-    protected $guarded = [];
+    protected $guarded = ['id'];
+    protected $with = ['barangs'];
 
-
-    public function pangan()
+    public function barangs()
     {
-        return $this->hasMany(Pangan::class);
+        return $this->hasMany(Barang::class);
     }
 
    

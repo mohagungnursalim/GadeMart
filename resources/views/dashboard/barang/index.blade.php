@@ -33,6 +33,7 @@ Barang
                 <tr>
                     <th>No</th>
                     <th>Jenis Barang</th>
+                    <th>Gambar</th>
                     <th>Dibuat</th>
                     @if (auth()->user()->operator == 'hanyalihat')
 
@@ -46,6 +47,8 @@ Barang
                 <tr>
                     <td>{{ $loop->iteration }}</td>
                     <td>{{ $barang->nama }}</td>
+                    <td><img src="{{ asset('storage/' .$barang->image) }}" alt="{{ $barang->nama }}" width="50px">
+                    </td>
                     <td>{{ Carbon\Carbon::parse($barang->created_at)->format('d/m/Y') }}</td>
                     @if (auth()->user()->operator == 'hanyalihat')
 
@@ -107,6 +110,26 @@ Barang
                         <span class="text-danger">{{ $message }}</span>
                         @enderror
                     </div>
+                    <div class="form-group">
+                        <select class="form-control" name="komoditas_id">
+                            <option>-Pilih Komoditas-</option>
+                            @foreach ($komoditas as $kmd)
+                            <option value="{{$kmd->id}}"> {{$kmd->nama}}</option>
+                            @endforeach
+                           
+                        </select>
+                        @error('komoditas_id')
+                        <span class="text-danger">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    <div class="form-group">
+                        <label for="formGroupExampleInput">Gambar</label>
+                        <img  class="img-preview img-fluid mb-3 col-sm-5" width="140px">
+                        <input onchange="previewImage()" id="image" type="file" value="{{ old('image') }}" class="form-control" name="image" id="formGroupExampleInput">
+                        @error('image')
+                        <span class="text-danger">{{ $message }}</span>
+                        @enderror
+                    </div>
             </div>
             <div class="modal-footer">
                 <button type="submit" class="btn btn-success">Simpan</button>
@@ -142,6 +165,21 @@ Barang
                             id="formGroupExampleInput">
 
                         @error('nama')
+                        <span class="text-danger">{{ $message }}</span>
+                        @enderror
+                    </div>
+                    <div class="form-group">
+                        <label for="editimage">Gambar</label>
+                        @if($barang->image)
+                        <img src="{{ asset('storage/' .$barang->image) }}"
+                            class="img-preview img-fluid mb-3 col-sm-5 d-block" id="edit-preview">
+                        @else
+                        <img src="#" class="img-preview img-fluid mb-3 col-sm-5 d-none" id="edit-preview">
+                        @endif
+                        <input onchange="editImage()" id="editimage" type="file" class="form-control" name="image"
+                            accept="image/*">
+
+                        @error('image')
                         <span class="text-danger">{{ $message }}</span>
                         @enderror
                     </div>
@@ -202,7 +240,7 @@ Barang
 @endif
 
 {{-- input image preciew --}}
-{{-- <script>
+<script>
     function previewImage() {
 
         const image = document.querySelector('#image');
@@ -221,26 +259,23 @@ Barang
         }
     }
 
-</script> --}}
+</script>
 
-{{-- edit image preciew --}}
-{{-- <script>
+{{-- edit image preview --}}
+<script>
     function editImage() {
-
         const image = document.querySelector('#editimage');
-        const editPreview = document.querySelector('.edit-preview');
+        const editPreview = document.querySelector('#edit-preview');
 
-        editPreview.style.display = 'block';
+        const file = image.files[0];
+        const reader = new FileReader();
 
-        const oFReader = new FileReader();
-
-        oFReader.readAsDataURL(image.files[0]);
-
-        oFReader.onload = function (oFREvent) {
-
-            editPreview.src = oFREvent.target.result;
-
+        reader.onload = function (e) {
+            editPreview.src = e.target.result;
+            editPreview.classList.remove('d-none'); // Tampilkan gambar preview
         }
+
+        reader.readAsDataURL(file);
     }
 
-</script> --}}
+</script>

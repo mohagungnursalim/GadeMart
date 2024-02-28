@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Barang;
+use App\Models\Komoditas;
+
 use Illuminate\Http\Request;
 use Alert;
 class BarangController extends Controller
@@ -12,13 +14,14 @@ class BarangController extends Controller
      */
     public function index()
     {
-        $barangs = Barang::latest()->paginate(10);
 
+        $barangs = Barang::latest()->paginate(10);
+        $komoditas = Komoditas::latest()->get();
         if (request('search')) {
             $barangs = Barang::where('nama', 'like', '%' . request('search') . '%')->latest()->paginate(10);
         } 
         
-        return view('dashboard.barang.index',compact('barangs'));
+        return view('dashboard.barang.index',compact('barangs','komoditas'));
     }
 
     /**
@@ -34,11 +37,22 @@ class BarangController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'nama' => 'required',       
+        $validatedData = $request->validate([
+            'nama' => 'required|string|max:50',
+            'komoditas_id' => 'required|exists:komoditas,id',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
-
-        Barang::create($request->all());
+    
+        // Memastikan file gambar ada sebelum mencoba menyimpannya
+        if($request->hasFile('image')){
+            // Menyimpan gambar ke direktori yang ditentukan
+            $imagePath = $request->file('image')->store('barang-image', 'public');
+            // Menggunakan path gambar yang disimpan untuk menyimpan dalam database
+            $validatedData['image'] = $imagePath;
+        }
+    
+        // Membuat record Barang dengan data yang divalidasi
+        Barang::create($validatedData);
         $request->session(Alert::success('success', 'Barang berhasil ditambahkan!'));
         return redirect('/dashboard/barang');
     }

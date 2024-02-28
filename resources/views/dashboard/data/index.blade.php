@@ -38,51 +38,15 @@ Tabel Harga
 
                 @else
                 @can('admin')
-
-                <form class="form-inline" action="/dashboard/master-data">
-                    <div class="input-group">
-                        <input type="date" name="periode" class="form-control">
-                    </div>
-                    <button class="btn btn-outline-dark" type="submit">
-                        <i class="fas fa-filter fa-sm">Filter</i>
-                    </button>
-                </form>
-
                 <form class="form-inline spaced col" action="/dashboard/master-data">
                     <div class="input-group">
 
-                        <select class="form-control " id="theSelect" name="komoditas">
-                            <option>
-                                --komoditas--
-                            </option>
-                            @foreach ($komoditas as $kmd )
-
-                            <option>
-                                {{ $kmd->nama }}
-                            </option>
+                        <select class="form-control" name="filter" id="">
+                            <option value="">--Pilih Pasar--</option>
+                            @foreach ($pasars as $pasar)
+                            <option value="{{$pasar->nama}}" {{$pasar->nama === request('filter') ? 'selected' : ''}}>
+                                {{$pasar->nama}}</option>
                             @endforeach
-
-                        </select>
-                    </div>
-                    <button class="btn btn-outline-dark" type="submit">
-                        <i class="fas fa-filter fa-sm">Filter</i>
-                    </button>
-                </form>
-
-                <form class="form-inline spaced col" action="/dashboard/master-data">
-                    <div class="input-group">
-
-                        <select class="form-control " id="theSelect" name="pasar">
-                            <option>
-                                --Pasar--
-                            </option>
-                            @foreach ($pasars as $pasar )
-
-                            <option>
-                                {{ $pasar->nama }}
-                            </option>
-                            @endforeach
-
                         </select>
                     </div>
                     <button class="btn btn-outline-dark" type="submit">
@@ -103,25 +67,26 @@ Tabel Harga
                 @endif
 
 
-                @if (auth()->user()->is_admin == false)
-                <a class="btn btn-outline-secondary" data-toggle="modal" data-target="#filter">
-                    <i class="fas fa-filter fa-sm"> Filter</i>
-                </a>
-                @else
-
-                @endif
+                
 
                 &nbsp;
-                <a class="btn btn-outline-success" data-toggle="modal" data-target="#exampleModal"><i
-                        class="fas fa-file-excel"> Export</i></a>
+                @if (Auth::user()->is_admin)
+                <button class="btn btn-outline-success" data-toggle="modal" data-target="#exportModal"><i class="fas fa-file-excel">Export</i></button>
+                @else
+                <form action="/export" method="get">
+                    @csrf
+                    <button type="submit" class="btn btn-outline-success"><i
+                        class="fas fa-file-excel">Export</i>
+                    </button>
+
+                </form>
+                @endif
             </div>
         </div>
 
         @if (request('search'))
         <div class="container mt-4 mb-4">
-
             <a class="text-decoration-none text-dark">Filter Data: <kbd> "{{ request('search') }}"</kbd></a>
-
         </div>
         @endif
 
@@ -132,75 +97,84 @@ Tabel Harga
                         <div class="d-flex flex-nowrap">
                             <!-- Content here -->
 
-                            <table id="myTable" class="table text-dark table-bordered table-hover text-center">
-                                <tr>
-                                    <th class="align-middle">No</th>
-                                    <th class="align-middle">Pasar</th>
-                                    <th class="align-middle">Komoditas</th>
-                                    <th class="align-middle">Jenis Barang</th>
-                                    <th class="align-middle">Satuan</th>
-                                    <th class="align-middle">Harga Sebelum</th>
-                                    <th class="align-middle">Harga Terkini</th>
-                                    <th class="align-middle">Periode</th>
-                                    <th class="align-middle">Keterangan</th>
-                                    @if (auth()->user()->operator == 'hanyalihat')
-
-                                    @else
-                                    <th class="align-middle">Aksi</th>
+                            <table class="table table-bordered table-hover table-condensed">
+                                <tbody>
+                                    <tr>
+                                        <th>NO</th>
+                                        <th>KOMODITAS</th>
+                                        <th>SATUAN</th>
+                                        <th>HARGA LAMA</th>
+                                        <th>HARGA SEKARANG</th>
+                                        <th class="right">PERUBAHAN (Rp)</th>
+                                        <th class="right">PERUBAHAN (%)</th>
+                                        <th>AKSI</th>
+                                    </tr>
+                        
+                                    @foreach ($komoditas as $kmd)
+                                    <tr>
+                                        <td>{{$loop->iteration}}</td>
+                                        <td>{{$kmd->nama}}</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td class="right sekarang"></td>
+                                        <td class="right"></td>
+                                        <td class="right"> <span class=""></span></td>
+                                    </tr>
+                        
+                                    @foreach ($kmd->barangs as $barang)
+                                    @foreach ($barang->pangans as $pangan)
+                                    @if ($pangan->pasar === request('filter') || request('filter') == '')
+                                    <tr>
+                                        <td></td>
+                                        <td>- {{$barang->nama}}</td>
+                                        <td>{{ $pangan->satuan }}</td>
+                                        <td class="text-center">
+                                          @if ($pangan->harga_sebelum)
+                                              Rp{{number_format($pangan->harga_sebelum)}}
+                                          @else
+                                          -
+                                          @endif
+                                        </td>
+                                        <td class="right sekarang text-center">
+                                            Rp{{ number_format($pangan->harga) }}
+                                        </td>
+                                        <td class="right text-center">
+                                          Rp{{ number_format($pangan->perubahan_rp) }} 
+                                        </td>
+                                        <td class="right text-center">
+                                             {{ number_format($pangan->perubahan_persen) }}%{{$pangan->keterangan}}  
+                                      </td>
+                                       <td>
+                                            <button type="button" class="btn btn-warning" data-toggle="modal"
+                                                data-target="#exampleModalku{{ $pangan->id }}">
+                                                <i class="fas fa-fw fa-edit"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-danger" data-toggle="modal"
+                                                data-target="#exampleModaldelete{{ $pangan->id }}">
+                                                <i class="fas fa-fw fa-trash"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
                                     @endif
-
-
-                                </tr>
-                                @if($pangans->count())
-                                @foreach ($pangans as $pangan )
-
-                                <tr class="align-middle">
-
-                                    <td>{{ $loop->iteration }}</td>
-                                    <td>{{ $pangan->pasar }}</td>
-                                    <td>{{ $pangan->komoditas }}</td>
-                                    <td>-{{ $pangan->jenis_barang }}</td>
-                                    <td>{{ $pangan->satuan }}</td>
-                                    <td>
-                                        @if ($pangan->harga_sebelum == null)
-                                        -
-                                        @else
-                                        Rp{{ number_format($pangan->harga_sebelum) }}
-                                        @endif
-
-                                    </td>
-                                    <td>Rp{{ number_format($pangan->harga) }} </td>
-                                    <td>{{ $pangan->periode->format('d/m/Y') }}</td>
-                                    <td>
-                                        {{ $pangan->keterangan }}
-                                    </td>
-                                    @if (auth()->user()->operator == 'hanyalihat')
-
-                                    @else
-                                    <td>
-                                        <button type="button" class="btn btn-warning" data-toggle="modal"
-                                            data-target="#exampleModalku{{ $pangan->id }}">
-                                            <i class="fas fa-fw fa-edit"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-danger" data-toggle="modal"
-                                            data-target="#exampleModaldelete{{ $pangan->id }}">
-                                            <i class="fas fa-fw fa-trash"></i>
-                                        </button>
-                                    </td>
-                                    @endif
-
-                                </tr>
-                                @endforeach
-                                @else
-                                <tr>
-                                    <td class="text-center" colspan="10">Tidak ada data..<img
-                                            src="https://img.icons8.com/ios/24/000000/sad.png" /></td>
-                                </tr>
-                                @endif
+                                    @endforeach
+                                    @endforeach
+                                    @endforeach
+                                </tbody>
                             </table>
+                            
+                            
 
-
-
+                            {{-- tombol edit/delete --}}
+                            {{-- <td>
+                                <button type="button" class="btn btn-warning" data-toggle="modal"
+                                    data-target="#exampleModalku{{ $pangan->id }}">
+                                    <i class="fas fa-fw fa-edit"></i>
+                                </button>
+                                <button type="button" class="btn btn-danger" data-toggle="modal"
+                                    data-target="#exampleModaldelete{{ $pangan->id }}">
+                                    <i class="fas fa-fw fa-trash"></i>
+                                </button>
+                            </td> --}}
                         </div>
                     </div>
                 </div>
@@ -210,7 +184,7 @@ Tabel Harga
         </div>
         
         <div class="d-flex justify-content-center">
-            {{ $pangans->links() }}
+            {{-- {{ $pangans->links() }} --}}
         </div>
     </div>
         
@@ -258,11 +232,11 @@ Tabel Harga
 
                             <div class="form-group">
                                 <label for="exampleFormControlSelect1">Komoditas</label>
-                                <select required class="form-control"  name="komoditas">
+                                <select required class="form-control"  name="komoditas_id">
                                     <option>-Pilih Komoditas-</option>
                                     @foreach ($komoditas as $kmd )
 
-                                    <option value="{{ $kmd->nama }}">
+                                    <option value="{{ $kmd->id }}">
                                         {{ $kmd->nama }}
                                     </option>
                                     
@@ -270,27 +244,23 @@ Tabel Harga
 
                                 </select>
 
-                                @error('komoditas')
+                                @error('komoditas_id')
                                 <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
 
                             <div class="form-group">
                                 <label for="exampleFormControlSelect1">Jenis Barang</label>
-                                <select required class="form-control" data-live-search="true" name="jenis_barang">
-                                    
+                                <select class="form-control" name="barang_id">
                                     <option>-Pilih Barang-</option>
-                                    @foreach ($barangs as $barang )
-
-                                    <option value="{{ $barang->nama }}">
-                                        {{ $barang->nama }}
-                                    </option>
-                                    
+                                    @foreach ($barangs as $barang)
+                                    <option value="{{$barang->id}}"> {{$barang->nama}}</option>
+        
                                     @endforeach
-
+                                   
                                 </select>
-
-                                @error('jenis_barang')
+                                
+                                @error('barang_id')
                                 <span class="text-danger">{{ $message }}</span>
                                 @enderror
                             </div>
@@ -360,7 +330,7 @@ Tabel Harga
 </div>
 
 <!-- Modal edit harga -->
-@foreach ($pangans as $pangan )
+{{-- @foreach ($pangans as $pangan )
 <div class="modal fade" id="exampleModalku{{ $pangan->id }}" tabindex="-1" role="dialog"
     aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -404,11 +374,11 @@ Tabel Harga
                         <label for="exampleFormControlSelect1">Komoditas</label>
                         <select required class="form-control text-success" name="komoditas">
                             <option>---------------------Pilih Komoditas---------------------</option>
-                            <option selected value="{{ old('komoditas',$pangan->komoditas) }}">{{ $pangan->komoditas }}
-                                @foreach ($komoditas as $kmd )
+                            <option selected value="{{ old('komoditas_id',$pangan->komoditas->nama) }}">{{ $pangan->komoditas }}
+                                @foreach ($pangans as $kmd )
 
-                            <option value="{{ old('komoditas' ,$kmd->nama) }}" @selected(old('komoditas')==$kmd->nama)>
-                                {{ $kmd->nama }}
+                            <option value="{{ old('komoditas_id' ,$kmd->komoditas->nama) }}" @selected(old('komoditas')==$kmd->komoditas->nama)>
+                                {{ $kmd->komoditas->nama }}
                             </option>
                             @endforeach
 
@@ -418,9 +388,18 @@ Tabel Harga
                     </div>
 
                     <div class="form-group">
-                        <label for="">Jenis Barang</label>
-                        <input type="text" id="jenis_barang" value="{{ old('jenis_barang',$pangan->jenis_barang) }}"
-                            onkeyup="sum();" name="jenis_barang" class="form-control text-success">
+                        <label for="exampleFormControlSelect1">Jenis Barang</label>
+                        <select required class="form-control text-success" name="komoditas">
+                            <option>---------------------Pilih Barang---------------------</option>
+                            <option selected value="{{ old('barang_id',$pangan->barang->nama) }}">{{ $pangan->barang->nama }}
+                                @foreach ($pangans as $brg )
+
+                            <option value="{{ old('barang_id' ,$brg->barang->nama) }}" @selected(old('barang_id')==$brg->barang->nama)>
+                                {{ $brg->barang->nama }}
+                            </option>
+                            @endforeach
+
+                        </select>
 
 
                     </div>
@@ -479,10 +458,10 @@ Tabel Harga
         </div>
     </div>
 </div>
-@endforeach
+@endforeach --}}
 
-@foreach ($pangans as $pangan )
-<!-- Modal Delete Data -->
+{{-- Modal delete harga --}}
+{{-- @foreach ($pangans as $pangan )
 <div class="modal fade" id="exampleModaldelete{{ $pangan->id }}" tabindex="-1" role="dialog"
     aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
@@ -510,91 +489,16 @@ Tabel Harga
         </div>
     </div>
 </div>
-@endforeach
+@endforeach --}}
 
-<!-- Modal filter -->
-<div class="modal fade" id="filter" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Filter Data</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
 
-                <div class="container">
-                    <label for="">Urut berdasarkan periode</label>
-                    <form class="form-inline mb-3" action="/dashboard/master-data">
-                        <div class="input-group">
-                            <input type="date" name="periode" class="form-control">
-                        </div>
-                        <button class="btn btn-outline-dark" type="submit">
-                            <i class="fas fa-filter fa-sm">Filter</i>
-                        </button>
-                    </form>
-
-                    <label for="">Urut berdasarkan komoditas </label>
-                    <form class="form-inline mb-3" action="/dashboard/master-data">
-                        <div class="input-group">
-                            <select class="form-control " id="theSelect" name="komoditas">
-                                <option>
-                                    --komoditas--
-                                </option>
-                                @foreach ($komoditas as $kmd )
-
-                                <option>
-                                    {{ $kmd->nama }}
-                                </option>
-                                @endforeach
-
-                            </select>
-                        </div>
-                        <button class="btn btn-outline-dark" type="submit">
-                            <i class="fas fa-filter fa-sm">Filter</i>
-                        </button>
-                    </form>
-
-                    @can('admin')
-                    <label for="">Urut berdasarkan pasar </label>
-                    <form class="form-inline spaced" action="/dashboard/master-data">
-                        <div class="input-group">
-
-                            <select class="form-control " id="theSelect" name="pasar">
-                                <option>
-                                    --Pasar--
-                                </option>
-                                @foreach ($pasars as $pasar )
-
-                                <option>
-                                    {{ $pasar->nama }}
-                                </option>
-                                @endforeach
-
-                            </select>
-                        </div>
-                        <button class="btn btn-outline-dark" type="submit">
-                            <i class="fas fa-filter fa-sm">Filter</i>
-                        </button>
-                    </form>
-                    @endcan
-                </div>
-
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
 {{-- Modal Export excel --}}
 
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<div class="modal fade" id="exportModal" tabindex="-1" aria-labelledby="exportModal" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="exampleModalLabel">Export Excel</h5>
+                <h5 class="modal-title" id="exportModal">Export Excel</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -605,22 +509,15 @@ Tabel Harga
                     <button type="submit" class="btn btn-outline-success">Download semua <i
                             class="fas fa-fw fa-download"></i></button>
                 </form>
-                <form action="/export" class="form-inline" method="get">
-
-
-                    <input type="date" class="form-control" name="exportperiode" required>
-                    <button type="submit" class="btn btn-outline-success"> <i
-                            class="fas fa-fw fa-download"></i></button>
-                </form>
 
                 <form action="/export" class="form-inline mt-3" method="get">
 
-                    <select class="form-control" name="exportkomoditas">
-                        <option>--Komoditas--</option>
-                        @foreach ($komoditas as $kmd )
+                    <select class="form-control" name="filter">
+                        <option>--Pilih Pasar--</option>
+                        @foreach ($pasars as $pasar )
 
-                        <option required value="{{ $kmd->nama }}" @selected(old('komoditas')==$kmd->nama)>
-                            {{ $kmd->nama }}
+                        <option required value="{{ $pasar->nama }}" @selected(old('pasar')==$pasar->nama)>
+                            {{ $pasar->nama }}
                         </option>
                         @endforeach
 

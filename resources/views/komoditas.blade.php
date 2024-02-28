@@ -12,37 +12,83 @@ Komoditas
     --}}
     <br>
     <div class="text-center text-dark mt-2">
-        <h2><b>Komoditas</b></h2>
+        <h2><b>Tabel Harga</b></h2>
     </div>
-    <section id="portfolio" class="portfolio">
-        <div class="container">
-  
-          
-  
-        
-  
-          <div class="row portfolio-container aos-init aos-animate" data-aos="fade-up" data-aos-delay="200" style="position: relative; height: 3030.75px;">
-  
-            @foreach ($komoditas as $kmd)
-
-            <div class="col-lg-4 col-md-6 portfolio-item filter-app" style="position: absolute; left: 0px; top: 0px;">
-              <div class="portfolio-wrap">
-                <img src="{{ asset('storage/' .$kmd->image) }}" class="img-fluid" alt="">
-                <div class="portfolio-info">
-                  <h4>{{ $kmd->nama }}</h4>
-                  
-                  <div class="portfolio-links">
-                    <a href="{{ asset('storage/' .$kmd->image) }}" data-gallery="portfolioGallery" class="portfolio-lightbox" ><i class="bx bx-plus"></i></a>
-                    <a href="/komoditas/{{ $kmd->nama}}" title="More Details"><i class="bx bx-link"></i></a>
-                  </div>
+    
+    <section class="portfolio">
+      <div class="container">
+        <div class="d-flex justify-content-center">
+            <form action="/tabel-harga" method="get">
+                <div class="row g-3 align-items-center mb-2">
+                    <div class="col-auto">
+                        <select class="form-control" name="filter" id="">
+                            <option value="">--Pilih Pasar--</option>
+                            @foreach ($pasars as $pasar)
+                            <option value="{{$pasar->nama}}" {{$pasar->nama === request('filter') ? 'selected' : ''}}>
+                                {{$pasar->nama}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <button class="btn btn-primary" type="submit">Filter</button>
+                    </div>
                 </div>
-              </div>
-            </div>
-                            
-            @endforeach
-        
-          </div>
-  
+            </form>
         </div>
-      </section>
+        <table class="table table-bordered table-hover table-condensed">
+            <tbody>
+                <tr>
+                    <th>NO</th>
+                    <th>KOMODITAS</th>
+                    <th>SATUAN</th>
+                    <th>HARGA LAMA</th>
+                    <th>HARGA SEKARANG</th>
+                    <th class="right">PERUBAHAN (Rp)</th>
+                    <th class="right">PERUBAHAN (%)</th>
+                </tr>
+    
+                @foreach ($komoditas as $kmd)
+                <tr>
+                    <td>{{$loop->iteration}}</td>
+                    <td>{{$kmd->nama}}</td>
+                    <td></td>
+                    <td></td>
+                    <td class="right sekarang"></td>
+                    <td class="right"></td>
+                    <td class="right"> <span class=""></span></td>
+                </tr>
+    
+                @foreach ($kmd->barangs as $barang)
+                @foreach ($barang->pangans as $pangan)
+                @if ($pangan->pasar === request('filter') || request('filter') == '')
+                <tr>
+                    <td></td>
+                    <td>- {{$barang->nama}}</td>
+                    <td>{{ $pangan->satuan }}</td>
+                    <td class="text-center">
+                      @if ($pangan->harga_sebelum)
+                          Rp{{number_format($pangan->harga_sebelum)}}
+                      @else
+                      -
+                      @endif
+                    </td>
+                    <td class="right sekarang text-center">
+                        Rp{{ number_format($pangan->harga) }}
+                    </td>
+                    <td class="right text-center">
+                      Rp{{ number_format($pangan->perubahan_rp) }} 
+                    </td>
+                    <td class="right text-center">
+                         {{ number_format($pangan->perubahan_persen) }}%{{$pangan->keterangan}}  
+                  </td>
+                </tr>
+                @endif
+                @endforeach
+                @endforeach
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+    
+    </section>
     @endsection

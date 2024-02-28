@@ -11,6 +11,15 @@ class Barang extends Model
 
     protected $table = 'barangs';
     // protected $guarded = ['id'];
-    protected $guarded = [];
+    protected $guarded = ['id'];
     
+    public function komoditas()
+    {
+        return $this->belongsTo(Komoditas::class);
+    }
+
+    public function pangans()
+    {
+        return $this->hasMany(Pangan::class);
+    }
 }

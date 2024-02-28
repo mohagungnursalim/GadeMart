@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Komoditas;
 use Illuminate\Http\Request;
 use App\Models\Pangan;
+use App\Models\Barang;
 use App\Models\Pasar;
 use Illuminate\Support\Carbon;
 
@@ -16,22 +17,10 @@ class FrontendController extends Controller
     public function index()
     {
 
-        $pangans = Pangan::latest();
-        
-        $pangans = $pangans->paginate(6);
-        if (request('filter')) {
-            $pangans = Pangan::where('jenis_barang', 'like', '%' . request('filter') . '%')->
-                                orWhere('komoditas', 'like', '%' . request('filter') . '%')->
-                                orWhere('pasar', 'like', '%' . request('filter') . '%')->
-                                orWhere('periode', 'like', '%' . request('filter') . '%')
-            ->latest();
 
-            $pangans = $pangans->paginate(6)->withQueryString();
-        } 
+        $barangs = Barang::with('pangans')->latest()->get();
 
-       
-
-        return view('index',compact('pangans'));
+        return view('index',compact('barangs'));
     }
 
     /**
@@ -93,32 +82,48 @@ class FrontendController extends Controller
     public function komoditas()
     {
 
-        $komoditas = Komoditas::latest()->get();
-       
-       
+        $pasars = Pasar::select('nama')->latest()->get();
+        // $komoditas = Komoditas::with('barangs.pangans')->latest()->get();
 
-        return view('komoditas',compact('komoditas'));
-    }
+        // Ambil data komoditas dengan relasi barangs.pangans dan filter berdasarkan "Pasar Inpres Manonda"
+        // $komoditas = Komoditas::with(['barangs.pangans' => function ($query) {
+        //     $query->where('pasar', 'Pasar Inpres Manonda');
+        // }])->latest()->get();
 
-     public function showkomoditas(string $nama)
-    {
 
-       
+        // Tentukan pasar yang akan digunakan untuk filter
+        $selectedPasar = request('filter');
+        
+        // Inisialisasi variabel untuk menyimpan hasil query
+        $komoditas = null;
 
-        // $now = Carbon::now()->subDay()->toDateString();
-
-        $komoditas = Komoditas::where('nama', $nama)->first();
-        $pasars = Pasar::latest()->get();
-        $pangans = Pangan::where('komoditas', $nama)->latest()->paginate(5)->withQueryString();
-
-        if (request('pasar')){
-            $pangans =  Pangan::where('pasar', 'like', '%' . request('pasar') . '%')->where('komoditas', $nama)->latest()->paginate(5)->withQueryString();
+        // Jika filter tidak diberikan, atau jika filter kosong
+        if ($selectedPasar) {
+            // Ambil data komoditas dengan relasi barangs.pangans dan filter berdasarkan pasar yang ditentukan
+            $komoditas = Komoditas::with(['barangs.pangans' => function ($query) use ($selectedPasar) {
+                $query->where('pasar', $selectedPasar);
+            }])->latest()->get();
+        } else {
+        // Ambil data komoditas dengan relasi barangs.pangans dan filter berdasarkan pasar yang ditentukan
+        // $komoditas = Komoditas::with(['barangs.pangans' => function ($query) use ($selectedPasar) {
+        //     $query->where('pasar', $selectedPasar);
+        // }])->latest()->get();
+        $komoditas = Komoditas::with(['barangs.pangans' => function ($query) {
+            $query->where('pasar', 'Pasar Inpres Manonda');
+        }])->latest()->get();
+        
         }
 
-        
-        
+        return view('komoditas',compact('komoditas','pasars'));
+    }
 
-        return view('komoditas-show',compact('komoditas','pangans','pasars'));
+
+    
+    public function showkomoditas($slug)
+    {
+    
+        $komoditas = Komoditas::where('slug', $slug)->with('barangs')->firstOrFail();
+        return view('komoditas-show', compact('komoditas'));
     }
 
 }

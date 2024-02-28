@@ -29,9 +29,8 @@ class AduanExport implements FromQuery, WithMapping, ShouldAutoSize, WithHeading
             return Aduan::query()->orderBy('created_at', 'desc');
         }elseif (auth()->user()->is_admin == false) {
             return Aduan::query()->where('pasar', auth()->user()->operator)->orderBy('created_at', 'desc');
-           
         }
-       
+ 
         //  return Aduan::query();
     }    
 

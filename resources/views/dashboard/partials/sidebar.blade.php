@@ -1,5 +1,5 @@
 
-<ul class="navbar-nav bg-light sidebar sidebar-light accordion" id="accordionSidebar">
+<ul class="navbar-nav  sidebar sidebar-light accordion" id="accordionSidebar">
 
 
     <!-- Sidebar - Brand -->
@@ -52,11 +52,14 @@
     </li>
     @endcan
     
+    @can('admin')
     <li class="nav-item {{ Request::is('dashboard/pasar*') ? 'active' : '' }}">
         <a class="nav-link" href="/dashboard/pasar">
             <i class="fas fa-fw fa-shopping-cart"></i>
             <span>Data Pasar</span></a>
     </li>
+    @endcan
+
 
     <hr class="sidebar-divider">
     <li class="nav-item {{ Request::is('dashboard/aduan-masuk*') ? 'active' : '' }}">

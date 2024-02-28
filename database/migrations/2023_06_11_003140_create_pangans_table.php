@@ -15,12 +15,14 @@ return new class extends Migration
         Schema::create('pangans', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id');
-            $table->string('komoditas');
-            $table->string('jenis_barang');
+            $table->foreignId('barang_id');
+            $table->foreignId('komoditas_id');
             $table->string('satuan');
-            $table->string('harga_sebelum')->nullable();
-            $table->string('harga');
+            $table->integer('harga_sebelum')->nullable();
+            $table->integer('harga');
             $table->string('pasar');
+            $table->integer('perubahan_rp');
+            $table->integer('perubahan_persen');
             $table->string('keterangan');
             $table->timestamp('periode');
             $table->timestamps();

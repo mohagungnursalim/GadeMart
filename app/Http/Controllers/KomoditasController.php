@@ -6,6 +6,7 @@ use App\Models\Komoditas;
 use App\Models\Pangan;
 use Illuminate\Http\Request;
 use Alert;
+use Illuminate\Support\Str;
 use Illuminate\Auth\Events\Validated;
 use Illuminate\Support\Facades\DB;
 
@@ -18,12 +19,11 @@ class KomoditasController extends Controller
     {
 
         $komoditas = Komoditas::latest()->paginate(10);
+       
 
         if (request('search')) {
             $komoditas = Komoditas::where('nama', 'like', '%' . request('search') . '%')->latest()->paginate(10);
         } 
-        
-        
         
         
         return view('dashboard.komoditas.index',[
@@ -48,6 +48,12 @@ class KomoditasController extends Controller
             'nama' => 'required',
             'image' => 'required'       
         ]);
+
+        // Membuat slug dari nama komoditas
+        $slug = Str::slug($validatedData['nama']);
+
+        // Menambahkan slug ke dalam data yang akan disimpan
+        $validatedData['slug'] = $slug;
 
         if($request->file('image')){
             $validatedData['image'] = $request->file('image')->store('komoditas-image','public');
