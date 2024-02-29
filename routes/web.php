@@ -31,6 +31,7 @@ use Illuminate\Support\Facades\Route;
 
 
 Route::resource('/', FrontendController::class);
+Route::get('/results', [FrontendController::class,'search'])->name('search');
 Route::get('/tabel-harga',[FrontendController::class ,'komoditas']);
 Route::get('/komoditas/{slug}',[FrontendController::class ,'showkomoditas']);
 Route::resource('/aduan-pasar', AduanController::class);

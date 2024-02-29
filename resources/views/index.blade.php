@@ -22,11 +22,11 @@
 
 
             <div class="d-flex justify-content-center">
-                <form action="/" method="get">
+                <form action="{{ route('search') }}" method="get">
                     <div class="row g-3 align-items-center mb-2">
                         <div class="col-auto">
-                            <input type="text" value="{{request('filter')}}" class="form-control"
-                                placeholder="Kata Kunci.." name="filter">
+                            <input type="text" value="{{request('search_query')}}" class="form-control"
+                                placeholder="Kata Kunci.." name="search_query">
                         </div>
                         <div class="col-auto">
                             <button class="btn btn-primary" type="submit">Cari</button>

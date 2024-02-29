@@ -15,13 +15,41 @@ class FrontendController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
+        $query = $request->input('search_query');
 
-            $barangs = Barang::with('pangans')->latest()->paginate(20);
-
+        if ($query) {
+            $barangs = Barang::with('pangans')
+                            ->where('nama', 'LIKE', "%$query%")
+                            ->latest()
+                            ->paginate(20);
+        } else {
+            $barangs = Barang::with('pangans')
+                            ->latest()
+                            ->paginate(20);
+        }
 
         return view('index',compact('barangs'));
+    }
+
+    // Fungsi untuk menangani pencarian barang
+    public function search(Request $request)
+    {
+        $query = $request->input('search_query');
+
+        if ($query) {
+            $barangs = Barang::with('pangans')
+                            ->where('nama', 'LIKE', "%$query%")
+                            ->latest()
+                            ->paginate(20);
+        } else {
+            $barangs = Barang::with('pangans')
+                            ->latest()
+                            ->paginate(20);
+        }
+
+        return view('index', compact('barangs'));
     }
 
     /**
