@@ -14,8 +14,8 @@
                 <li><a class="nav-link scrollto {{ Request::is('aduan-pasar*') ? 'active' : '' }}" href="/aduan-pasar">Aduan Pasar</a></li>
                 <li class="dropdown"><a href="#"><span>Website</span> <i class="bi bi-chevron-down"></i></a>
                     <ul>
-                        <li><a href="#">Web Disperdagind</a></li>
-                        <li><a href="#">Web Kota Palu</a></li>
+                        <li><a href="https://disperdagind.palukota.go.id/">Web Disperdagind</a></li>
+                        <li><a href="https://palukota.go.id/">Website Kota Palu</a></li>
                         @if (Auth::check())
                         <li><a href="/dashboard">Dashboard</a></li>
                         @else

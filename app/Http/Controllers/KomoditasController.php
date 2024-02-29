@@ -45,8 +45,7 @@ class KomoditasController extends Controller
     public function store(Request $request)
     {
        $validatedData = $request->validate([
-            'nama' => 'required',
-            'image' => 'required'       
+            'nama' => 'required'     
         ]);
 
         // Membuat slug dari nama komoditas
@@ -54,10 +53,6 @@ class KomoditasController extends Controller
 
         // Menambahkan slug ke dalam data yang akan disimpan
         $validatedData['slug'] = $slug;
-
-        if($request->file('image')){
-            $validatedData['image'] = $request->file('image')->store('komoditas-image','public');
-        }
 
         Komoditas::create($validatedData);
         $request->session(Alert::success('success', 'Data berhasil ditambahkan!'));
@@ -92,15 +87,9 @@ class KomoditasController extends Controller
         
 
        $validatedData = $request->validate([
-            'nama' => 'required',
-            'image' => 'required'     
+            'nama' => 'required'   
         ]);
        
-        if($request->file('image')){
-            $validatedData['image'] = $request->file('image')->store('komoditas-image','public');
-        }
-
-        
         $komoditas->update($validatedData);
         
 
