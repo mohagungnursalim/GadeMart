@@ -163,10 +163,6 @@ class PanganController extends Controller
         $data->perubahan_rp = $perubahan_rp;
         $data->perubahan_persen = $perubahan_persen;
         $data->keterangan = $keterangan;
-
-        // Pangan::create($data);
-
-        // dd($data);
         
         $data->save();
 
@@ -196,43 +192,78 @@ class PanganController extends Controller
      * Update the specified resource in storage.
      */
     public function update(Request $request, Pangan $pangan, $id)
-    {
-        
-        $komoditas = $request->input('komoditas');
-        $pasar = $request->input('pasar');
-        $user_id = $request['user_id'] = auth()->user()->id;
-        $satuan = $request->input('satuan');
-        $barang_id = $request->input('barang_id');
-        $periode = $request->input('periode');
-        $harga_sebelum = $request->input('harga_sebelum');
-        $harga_terkini = $request->input('harga');
-        
-
-        if (isset($harga_sebelum)) {
-            if ($harga_terkini > $harga_sebelum ) {
-                $keterangan = 'Naik';
-            } elseif ($harga_terkini < $harga_sebelum) {
-                $keterangan = 'Turun';
-            } elseif ($harga_terkini == $harga_sebelum) {
-                $keterangan = 'Tetap';
-            } 
-        } else {
-            $keterangan = 'Tetap' ;
-        }
-
-        $pangan = Pangan::find($id);
-       
-        $pangan->komoditas = $komoditas;
-        $pangan->user_id  = $user_id;
-        $pangan->pasar = $pasar;
-        $pangan->satuan = $satuan;
-        $pangan->barang_id = $barang_id;
-        $pangan->periode = $periode;
-        $pangan->harga_sebelum = $harga_sebelum;
-        $pangan->harga = $harga_terkini;
-        $pangan->keterangan = $keterangan;
-        
-        $pangan->update();
+    {        
+            $komoditas_id = $request->input('komoditas_id');
+            $pasar = $request->input('pasar');
+            $user_id = $request['user_id'] = auth()->user()->id;
+            $satuan = $request->input('satuan');
+            $barang_id = $request->input('barang_id');
+            $periode = $request->input('periode');
+            $harga_sebelum = $request->input('harga_sebelum');
+            $harga_terkini = $request->input('harga');
+            
+           // Mengecek apakah ada data dengan jenis barang yang sama
+            // $existingData = Pangan::where('barang_id', $barang_id)
+            // ->where('pasar', $pasar)
+            // ->exists();
+    
+            // Jika data sudah ada, tampilkan pesan error
+            // if ($existingData) {
+    
+            //     $request->session(Alert::error('Oops..', 'Hanya boleh sekali input pada barang yang sama'));
+            //     return redirect()->back();
+            // }
+    
+    
+            // Membandingkan harga sehingga menjadi keterangan
+            if (isset($harga_sebelum)) {
+                if ($harga_terkini > $harga_sebelum ) {
+                    $keterangan = '⬆️';
+                } elseif ($harga_terkini < $harga_sebelum) {
+                    $keterangan = '⬇️';
+                } elseif ($harga_terkini == $harga_sebelum) {
+                    $keterangan = '➖';
+                } 
+            } else {
+            $keterangan = '➖' ;
+             }
+    
+            // mencari selisih kenaikan/penurunan dari harga sebelumnya
+            if ($harga_terkini > $harga_sebelum) 
+            {
+                $perubahan_rp = $harga_terkini - $harga_sebelum;
+            }elseif ($harga_terkini < $harga_sebelum) 
+            {
+                $perubahan_rp = $harga_sebelum - $harga_terkini;
+            }else{
+                $perubahan_rp = 0;
+            }
+            
+            if ($harga_sebelum) 
+            {
+                $perubahan = $harga_terkini - $harga_sebelum;
+                $perubahan_persen = ($perubahan / $harga_sebelum) * 100;
+            }
+    
+           
+    
+            $data = Pangan::find($id);
+    
+            
+            $data->user_id  = $user_id;
+            $data->komoditas_id = $komoditas_id;
+            $data->pasar = $pasar;
+            $data->satuan = $satuan;
+            $data->barang_id = $barang_id;
+            $data->periode = $periode;
+            $data->harga_sebelum = $harga_sebelum;
+            $data->harga = $harga_terkini;
+            $data->perubahan_rp = $perubahan_rp;
+            $data->perubahan_persen = $perubahan_persen;
+            $data->keterangan = $keterangan;
+            
+            // dd($data);
+            $data->update();
         
 
             $request->session(Alert::success('success', 'Data berhasil diupdate!'));

@@ -359,12 +359,12 @@ Tabel Harga
                     @endif
                     <div class="form-group">
                         <label for="exampleFormControlSelect1">Komoditas</label>
-                        <select required class="form-control text-success" name="komoditas">
+                        <select required class="form-control text-success" name="komoditas_id">
                             <option>---------------------Pilih Komoditas---------------------</option>
-                            <option selected value="{{ old('komoditas_id',$pangan->komoditas->nama) }}">{{ $pangan->komoditas->nama }}
+                            <option selected value="{{ old('komoditas_id',$pangan->komoditas->id) }}">{{ $pangan->komoditas->nama }}
                             @foreach ($komoditas as $kmdts)
 
-                            <option value="{{ old('komoditas_id' ,$kmdts->nama) }}" @selected(old('komoditas')==$kmdts->nama)>
+                            <option value="{{ old('komoditas_id' ,$kmdts->id) }}" @selected(old('komoditas_id')==$kmdts->id)>
                                 {{ $kmdts->nama }}
                             </option>
                             @endforeach
@@ -374,14 +374,14 @@ Tabel Harga
 
                     <div class="form-group">
                         <label for="exampleFormControlSelect1">Jenis Barang</label>
-                        <select required class="form-control text-success" name="komoditas">
+                        <select required class="form-control text-success" name="barang_id">
                             <option>---------------------Pilih Barang---------------------</option>
-                            <option selected value="{{ old('barang_id',$pangan->barang->nama) }}">{{ $pangan->barang->nama }}
-                                {{-- @foreach ($kmd->barangs as $barang )
-                                <option value="{{ old('barang_id' ,$barang->nama) }}" @selected(old('barang_id')==$barang->nama)>
+                            <option selected value="{{ old('barang_id',$pangan->barang->id) }}">{{ $pangan->barang->nama }}
+                                @foreach ($barangs as $barang )
+                                <option value="{{ old('barang_id' ,$barang->id) }}" @selected(old('barang_id')==$barang->id)>
                                     {{ $barang->nama }}
                                 </option>
-                                @endforeach --}}
+                                @endforeach
 
                         </select>
                     </div>
