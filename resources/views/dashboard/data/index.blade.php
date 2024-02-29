@@ -161,20 +161,6 @@ Tabel Harga
                                     @endforeach
                                 </tbody>
                             </table>
-                            
-                            
-
-                            {{-- tombol edit/delete --}}
-                            {{-- <td>
-                                <button type="button" class="btn btn-warning" data-toggle="modal"
-                                    data-target="#exampleModalku{{ $pangan->id }}">
-                                    <i class="fas fa-fw fa-edit"></i>
-                                </button>
-                                <button type="button" class="btn btn-danger" data-toggle="modal"
-                                    data-target="#exampleModaldelete{{ $pangan->id }}">
-                                    <i class="fas fa-fw fa-trash"></i>
-                                </button>
-                            </td> --}}
                         </div>
                     </div>
                 </div>
@@ -330,15 +316,16 @@ Tabel Harga
 </div>
 
 <!-- Modal edit harga -->
-{{-- @foreach ($pangans as $pangan )
+@foreach ($komoditas as $kmd )
+@foreach ($kmd->barangs as $barang)
+@foreach ($barang->pangans as $pangan )
 <div class="modal fade" id="exampleModalku{{ $pangan->id }}" tabindex="-1" role="dialog"
     aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title text-center" id="exampleModalLabel">Edit Data
-                    <kbd>{{ $pangan->jenis_barang }}</kbd><small>
-                        {{ Carbon\Carbon::parse($pangan->periode)->format('d-m-Y') }}</small></h5>
+                    <kbd>{{ $barang->nama }}</kbd></h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -374,17 +361,15 @@ Tabel Harga
                         <label for="exampleFormControlSelect1">Komoditas</label>
                         <select required class="form-control text-success" name="komoditas">
                             <option>---------------------Pilih Komoditas---------------------</option>
-                            <option selected value="{{ old('komoditas_id',$pangan->komoditas->nama) }}">{{ $pangan->komoditas }}
-                                @foreach ($pangans as $kmd )
+                            <option selected value="{{ old('komoditas_id',$pangan->komoditas->nama) }}">{{ $pangan->komoditas->nama }}
+                            @foreach ($komoditas as $kmdts)
 
-                            <option value="{{ old('komoditas_id' ,$kmd->komoditas->nama) }}" @selected(old('komoditas')==$kmd->komoditas->nama)>
-                                {{ $kmd->komoditas->nama }}
+                            <option value="{{ old('komoditas_id' ,$kmdts->nama) }}" @selected(old('komoditas')==$kmdts->nama)>
+                                {{ $kmdts->nama }}
                             </option>
                             @endforeach
 
                         </select>
-
-
                     </div>
 
                     <div class="form-group">
@@ -392,19 +377,14 @@ Tabel Harga
                         <select required class="form-control text-success" name="komoditas">
                             <option>---------------------Pilih Barang---------------------</option>
                             <option selected value="{{ old('barang_id',$pangan->barang->nama) }}">{{ $pangan->barang->nama }}
-                                @foreach ($pangans as $brg )
-
-                            <option value="{{ old('barang_id' ,$brg->barang->nama) }}" @selected(old('barang_id')==$brg->barang->nama)>
-                                {{ $brg->barang->nama }}
-                            </option>
-                            @endforeach
+                                {{-- @foreach ($kmd->barangs as $barang )
+                                <option value="{{ old('barang_id' ,$barang->nama) }}" @selected(old('barang_id')==$barang->nama)>
+                                    {{ $barang->nama }}
+                                </option>
+                                @endforeach --}}
 
                         </select>
-
-
                     </div>
-
-
 
                     <div class="form-group">
                         <label for="exampleFormControlSelect1">Satuan</label>
@@ -416,11 +396,7 @@ Tabel Harga
                             @endforeach
 
                         </select>
-
-
                     </div>
-
-
 
                     <div class="form-group">
                         <label for="">Harga Sebelum</label>
@@ -429,8 +405,6 @@ Tabel Harga
 
                     </div>
 
-
-
                     <div class="form-group">
                         <label for="">Harga Terkini</label>
                         <input type="number" id="harga" value="{{ old('harga',$pangan->harga) }}" name="harga"
@@ -438,17 +412,13 @@ Tabel Harga
 
                     </div>
 
-
-
                     <div class="form-group">
                         <label for="">Periode</label>
                         <input type="date" id=""  value="{{ old('harga',$pangan->periode->format('Y-m-d')) }}" name="periode"
                             class="form-control text-success">
 
-
                     </div>
                    
-
             </div>
             <div class="modal-footer">
                 <button type="submit" class="btn btn-primary">Save changes</button>
@@ -458,16 +428,20 @@ Tabel Harga
         </div>
     </div>
 </div>
-@endforeach --}}
+@endforeach
+@endforeach
+@endforeach
 
 {{-- Modal delete harga --}}
-{{-- @foreach ($pangans as $pangan )
+@foreach ($komoditas as $kmd )
+@foreach($kmd->barangs as $barang)
+@foreach ($barang->pangans as $pangan)
 <div class="modal fade" id="exampleModaldelete{{ $pangan->id }}" tabindex="-1" role="dialog"
     aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title text-dark" id="exampleModalLabel">Delete Data <kbd>{{ $pangan->jenis_barang }} | {{ $pangan->periode->format('d/m/Y') }}</kbd></h5>
+                <h5 class="modal-title text-dark" id="exampleModalLabel">Delete Data <kbd>{{ $barang->nama }}</kbd></h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -479,7 +453,7 @@ Tabel Harga
                     @csrf
                     @method('delete')
                     <h2 class="text-dark">Apakah anda yakin ingin menghapus <span
-                            class="badge badge-danger">{{ $pangan->jenis_barang }}</span> ?? </h2>
+                            class="badge badge-danger">{{ $barang->nama }}</span> ?? </h2>
             </div>
             <div class="modal-footer">
                 <button type="submit" class="btn btn-danger">Hapus</button>
@@ -489,8 +463,9 @@ Tabel Harga
         </div>
     </div>
 </div>
-@endforeach --}}
-
+@endforeach
+@endforeach
+@endforeach
 
 {{-- Modal Export excel --}}
 
