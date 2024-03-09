@@ -5,13 +5,15 @@ namespace App\Exports;
 use App\Models\Pangan;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithStyles;
+use Maatwebsite\Excel\Events\AfterSheet;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
 
 class TabelHargaExport implements FromQuery, WithMapping, ShouldAutoSize, WithHeadings, WithStyles
 {
@@ -27,38 +29,24 @@ class TabelHargaExport implements FromQuery, WithMapping, ShouldAutoSize, WithHe
 
     public function query()
     {
-
-        // $isAdmin = auth()->user()->is_admin;
-
-        // if ($isAdmin) {
-        //     return Pangan::with(['barang.komoditas'])->orderBy('komoditas_id', 'ASC')->orderBy('barang_id', 'ASC')->orderBy('created_at', 'desc');
-        // } else {
-        //     $operator = auth()->user()->operator;
-        //     return Pangan::with(['barang.komoditas'])->where('pasar', $operator)->orderBy('komoditas_id', 'ASC')->orderBy('barang_id', 'ASC')->orderBy('created_at', 'desc');
-        // }
-
         $panganQuery = Pangan::query();
 
         if ($this->isAdmin) {
-            // Jika admin, ekspor semua data harga
-            // Jika ada filter pasar yang dipilih, terapkan filter
             if ($this->filter) {
                 $panganQuery->where('pasar', 'like', '%' . $this->filter . '%');
             }
         } else {
-            // Jika bukan admin, hanya ekspor data harga dari pasar operator yang sesuai
             $operator = auth()->user()->operator;
             $panganQuery->where('pasar', $operator);
         }
 
-        // Ambil data harga sesuai dengan kondisi yang ditentukan
-        return $panganQuery->with(['barang.komoditas'])->orderBy('komoditas_id', 'ASC')->orderBy('barang_id', 'ASC')->orderBy('created_at', 'desc');
- 
+        return $panganQuery->with(['barang.komoditas'])->orderBy('komoditas_id', 'ASC')->orderBy('barang_id', 'ASC')->orderBy('pasar')->orderBy('created_at', 'desc');
     }    
 
     public function headings(): array
     {
         return [
+            'Pasar',
             'Komoditas',
             'Jenis Barang',   
             'Satuan',
@@ -73,9 +61,12 @@ class TabelHargaExport implements FromQuery, WithMapping, ShouldAutoSize, WithHe
 
     public function map($pangan): array
     {
+        if (!$pangan || !$pangan->barang || !$pangan->barang->komoditas) {
+            return [];
+        }
 
-        
         return [
+            $pangan->pasar,
             $pangan->barang->komoditas->nama,
             $pangan->barang->nama,
             $pangan->satuan,
@@ -85,19 +76,44 @@ class TabelHargaExport implements FromQuery, WithMapping, ShouldAutoSize, WithHe
             $pangan->perubahan_persen,
             $pangan->keterangan,
             Carbon::parse($pangan->periode)->format('d/M/Y')
-            
-            
         ];
     }
 
-    
     public function styles(Worksheet $sheet)
     {
         return [
-            // Style the first row as bold text.
             1    => ['font' => ['bold' => true]],
+            'A1:J1' => [
+                'alignment' => ['horizontal' => Alignment::HORIZONTAL_CENTER],
+            ],
+            'A1:J' . $sheet->getHighestRow() => [
+                'borders' => [
+                    'allBorders' => [
+                        'borderStyle' => Border::BORDER_THIN,
+                        'color' => ['argb' => 'FF000000'],
+                    ],
+                ],
+            ],
+        ];
+    }
 
-           
+    public function registerEvents(): array
+    {
+        return [
+            AfterSheet::class => function (AfterSheet $event) {
+                $sheet = $event->sheet;
+                $highestColumn = Coordinate::stringFromColumnIndex($sheet->getHighestColumn());
+
+                // Mengatur border untuk seluruh sel di tabel
+                $sheet->getStyle('A1:' . $highestColumn . $sheet->getHighestRow())->applyFromArray([
+                    'borders' => [
+                        'allBorders' => [
+                            'borderStyle' => Border::BORDER_THIN,
+                            'color' => ['argb' => 'FF000000'],
+                        ],
+                    ],
+                ]);
+            },
         ];
     }
 }
