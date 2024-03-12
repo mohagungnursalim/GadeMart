@@ -14,7 +14,7 @@
     --}}
     <br>
     <div class="text-center text-dark mt-2">
-        <h2><b>Harga Barang Kebutuhan Pokok dan Barang Penting</b></h2>
+        <h2><b>Harga Bahan Pokok dan Penting</b></h2>
     </div>
     <section id="harga" class="harga">
 
