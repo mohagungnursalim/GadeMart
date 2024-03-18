@@ -2,32 +2,54 @@
 
 use App\Models\User;
 use App\Providers\RouteServiceProvider;
+use Illuminate\Support\Facades\Http; 
+use Illuminate\Support\Facades\Hash; 
 
-test('login screen can be rendered', function () {
+
+test('Halaman Login bisa di render', function () {
     $response = $this->get('/login');
 
     $response->assertStatus(200);
 });
 
-test('users can authenticate using the login screen', function () {
-    $user = User::factory()->create();
+test('User dapat mengautentikasi dengan validasi dan reCAPTCHA benar', function () {
+    // Mocking the response from the reCAPTCHA API
+    Http::fake([
+        'https://www.google.com/recaptcha/api/siteverify' => Http::response(['success' => true]),
+    ]);
+
+    // Create a user with a hashed password
+    $user = User::factory()->create([
+        'password' => Hash::make('password'),
+    ]);
 
     $response = $this->post('/login', [
         'email' => $user->email,
-        'password' => 'password',
+        'password' => 'password', // Provide the actual password, Laravel will hash it automatically for comparison
+        'g-recaptcha-response' => 'valid-recaptcha-response', // Add a valid reCAPTCHA response
     ]);
 
     $this->assertAuthenticated();
     $response->assertRedirect(RouteServiceProvider::HOME);
 });
 
-test('users can not authenticate with invalid password', function () {
-    $user = User::factory()->create();
+test('User tidak dapat login dengan respons reCAPTCHA yang tidak valid & password salah', function () {
+    // Mocking the response from the reCAPTCHA API
+    Http::fake([
+        'https://www.google.com/recaptcha/api/siteverify' => Http::response(['success' => false]),
+    ]);
 
-    $this->post('/login', [
+    // Create a user with a hashed password
+    $user = User::factory()->create([
+        'password' => Hash::make('password'),
+    ]);
+
+    $response = $this->post('/login', [
         'email' => $user->email,
-        'password' => 'wrong-password',
+        'password' => 'wrong-password', 
+        'g-recaptcha-response' => 'invalid-recaptcha-response',
     ]);
 
     $this->assertGuest();
+    
 });
