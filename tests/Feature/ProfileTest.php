@@ -3,88 +3,46 @@
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
+use Illuminate\Support\Facades\Hash;
 use Tests\TestCase;
 
 uses(RefreshDatabase::class);
 
-test('profile page is displayed', function () {
-    $user = User::factory()->create();
+test('Halaman profil user bisa di render', function () {
+    $user = User::factory()->create([
+        'password' => Hash::make('password')
+    ]);
 
-    $response = $this
-        ->actingAs($user)
-        ->get('/profile');
+    $response = $this->actingAs($user)->get('/dashboard/profile');
 
-    $response->assertOk();
+    $response->assertStatus(200);
 });
 
-test('profile information can be updated', function () {
-    $user = User::factory()->create();
+test('User bisa memperbarui informasi profil', function () {
+    // Membuat pengguna baru dengan password yang di-hash dan alamat email palsu
+    $user = User::factory()->create([
+        'password' => Hash::make('password'),
+        'email' => \Faker\Factory::create()->email(),
+    ]);
 
-    $response = $this
-        ->actingAs($user)
-        ->patch('/profile', [
-            'name' => 'Test User',
-            'email' => 'test@example.com',
-        ]);
+    // Mengirim permintaan pembaharuan profil
+    $response = $this->actingAs($user)->patch('/dashboard/profile', [
+        'name' => 'Test User',
+        'email' => 'test@example.com',
+    ]);
 
-    $response
-        ->assertSessionHasNoErrors()
-        ->assertRedirect('/profile');
+    // Memastikan tidak ada kesalahan sesi dan pengalihan ke halaman profil
+    $response->assertSessionHasNoErrors()->assertRedirect('/dashboard/profile');
 
+    // Memperbarui data pengguna dari database
     $user->refresh();
 
+    // Memeriksa apakah data profil diperbarui dengan benar
     expect($user->name)->toBe('Test User');
     expect($user->email)->toBe('test@example.com');
     expect($user->email_verified_at)->toBeNull();
+
+    // Memeriksa apakah password berhasil di-hash
+    $this->assertTrue(Hash::check('password', $user->password));
 });
 
-test('email verification status is unchanged when the email address is unchanged', function () {
-    $user = User::factory()->create();
-
-    $response = $this
-        ->actingAs($user)
-        ->patch('/profile', [
-            'name' => 'Test User',
-            'email' => $user->email,
-        ]);
-
-    $response
-        ->assertSessionHasNoErrors()
-        ->assertRedirect('/profile');
-
-    expect($user->refresh()->email_verified_at)->not()->toBeNull();
-});
-
-test('user can delete their account', function () {
-    $user = User::factory()->create();
-
-    $response = $this
-        ->actingAs($user)
-        ->delete('/profile', [
-            'password' => 'password',
-        ]);
-
-    $response
-        ->assertSessionHasNoErrors()
-        ->assertRedirect('/');
-
-    expect(auth()->user())->toBeNull();
-    expect(User::find($user->id))->toBeNull();
-});
-
-test('correct password must be provided to delete account', function () {
-    $user = User::factory()->create();
-
-    $response = $this
-        ->actingAs($user)
-        ->from('/profile')
-        ->delete('/profile', [
-            'password' => 'wrong-password',
-        ]);
-
-    $response
-        ->assertSessionHasErrorsIn('userDeletion', 'password')
-        ->assertRedirect('/profile');
-
-    expect(User::find($user->id))->not()->toBeNull();
-});

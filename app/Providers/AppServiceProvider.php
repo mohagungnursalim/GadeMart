@@ -30,13 +30,12 @@ class AppServiceProvider extends ServiceProvider
         Paginator::useBootstrap();
 
         // dd($site_settings);
-        // View::share('settings', $site_settings);
-        View::share('pasars', Pasar::all());
+
+
+        // View::share('pasars', Pasar::all());
 
      
         View::share('settings', Setting::latest('created_at')->take(1)->get());
-
-
         Gate::define('admin',function(User $user){
 
             return $user->is_admin;
