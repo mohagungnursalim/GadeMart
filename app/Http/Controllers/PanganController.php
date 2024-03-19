@@ -83,7 +83,6 @@ class PanganController extends Controller
             'exists' => ':attribute Wajib diisi!'
         ];
        
-
         // validasi input
         $request->validate([
             'pasar' => 'required|exists:pasars,nama',
@@ -94,7 +93,6 @@ class PanganController extends Controller
             'periode' => 'required'
         ],$messages);
 
-        
         $komoditas_id = $request->input('komoditas_id');
         $pasar = $request->input('pasar');
         $user_id = $request['user_id'] = auth()->user()->id;
@@ -115,7 +113,6 @@ class PanganController extends Controller
             $request->session(Alert::error('Oops..', 'Hanya boleh sekali input pada barang yang sama'));
             return redirect()->back();
         }
-
 
         // Membandingkan harga sehingga menjadi keterangan
         if (isset($harga_sebelum)) {
@@ -145,13 +142,12 @@ class PanganController extends Controller
         {
             $perubahan = $harga_terkini - $harga_sebelum;
             $perubahan_persen = ($perubahan / $harga_sebelum) * 100;
+        }else{
+            $perubahan_persen = 0;
         }
 
-       
-
         $data = new Pangan();
-
-        
+  
         $data->user_id  = $user_id;
         $data->komoditas_id = $komoditas_id;
         $data->pasar = $pasar;
@@ -167,7 +163,7 @@ class PanganController extends Controller
         $data->save();
 
         $request->session(Alert::success('success', 'Data berhasil terinput!'));
-        return redirect('/dashboard/master-data');
+        return redirect('/dashboard/harga-pangan');
     }
 
     /**
@@ -201,20 +197,7 @@ class PanganController extends Controller
             $periode = $request->input('periode');
             $harga_sebelum = $request->input('harga_sebelum');
             $harga_terkini = $request->input('harga');
-            
-           // Mengecek apakah ada data dengan jenis barang yang sama
-            // $existingData = Pangan::where('barang_id', $barang_id)
-            // ->where('pasar', $pasar)
-            // ->exists();
-    
-            // Jika data sudah ada, tampilkan pesan error
-            // if ($existingData) {
-    
-            //     $request->session(Alert::error('Oops..', 'Hanya boleh sekali input pada barang yang sama'));
-            //     return redirect()->back();
-            // }
-    
-    
+        
             // Membandingkan harga sehingga menjadi keterangan
             if (isset($harga_sebelum)) {
                 if ($harga_terkini > $harga_sebelum ) {
@@ -267,7 +250,7 @@ class PanganController extends Controller
         
 
             $request->session(Alert::success('success', 'Data berhasil diupdate!'));
-            return redirect('/dashboard/master-data');
+            return redirect('/dashboard/harga-pangan');
 
     }
 
@@ -283,7 +266,7 @@ class PanganController extends Controller
         $pangan->delete();
 
         $request->session(Alert::success('success', 'Data berhasil dihapus!'));
-            return redirect('/dashboard/master-data');
+            return redirect('/dashboard/harga-pangan');
     }
 
 
@@ -332,7 +315,7 @@ class PanganController extends Controller
         
 
             $request->session(Alert::success('success', 'keterangan berhasil di update!'));
-            return redirect('/dashboard/master-data');
+            return redirect('/dashboard/harga-pangan');
 
     }
 

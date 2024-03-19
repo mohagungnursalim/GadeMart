@@ -11,16 +11,7 @@ Tabel Harga
 </head>
 
 
-<div class="card shadow mt-4">
-    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-        <div class="container">
-            <h6 class="m-0 font-weight-bold text-dark">DATA HARGA BAHAN KEBUTUHAN POKOK
-                </h6>
-        </div>
-
-
-    </div>
-   
+<div class="card shadow mt-4">  
     <div class="card-body">
 
         <div class="container">
@@ -38,7 +29,7 @@ Tabel Harga
 
                 @else
                 @can('admin')
-                <form class="form-inline spaced col" action="/dashboard/master-data">
+                <form class="form-inline spaced col" action="/dashboard/harga-pangan">
                     <div class="input-group">
 
                         <select class="form-control" name="filter" id="">
@@ -191,7 +182,7 @@ Tabel Harga
                 <div class="container">
                     <div class="card-body">
 
-                        <form method="post" action="/dashboard/master-data" class="text-dark">
+                        <form method="post" action="/dashboard/harga-pangan" class="text-dark">
                             @csrf
 
                             @if (Auth::user()->is_admin == true)
@@ -332,7 +323,7 @@ Tabel Harga
             </div>
             <div class="modal-body">
 
-                <form method="post" action="{{ route('master-data.update',$pangan->id)}}" class="text-dark">
+                <form method="post" action="{{ route('harga-pangan.update',$pangan->id)}}" class="text-dark">
                     @csrf
                     @method('put')
                     @if (Auth::user()->is_admin == true)
@@ -448,7 +439,7 @@ Tabel Harga
             </div>
             <div class="modal-body">
 
-                <form method="post" action="{{ route('master-data.destroy',$pangan->id) }}}}" class="mb-5"
+                <form method="post" action="{{ route('harga-pangan.destroy',$pangan->id) }}}}" class="mb-5"
                     enctype="multipart/form-data">
                     @csrf
                     @method('delete')

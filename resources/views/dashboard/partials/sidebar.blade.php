@@ -27,8 +27,8 @@
             <span>Dashboard</span></a>
     </li>
 
-    <li class="nav-item {{ Request::is('dashboard/master-data*') ? 'active' : '' }}">
-        <a class="nav-link" href="/dashboard/master-data">
+    <li class="nav-item {{ Request::is('dashboard/harga-pangan*') ? 'active' : '' }}">
+        <a class="nav-link" href="/dashboard/harga-pangan">
             <i class="fas fa-fw fa-table"></i>
             <span>Tabel Harga</span></a>
     </li>

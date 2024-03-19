@@ -47,7 +47,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::get('/dashboard', [PanganController::class, 'dashboard'])->middleware('auth','verified');
-Route::resource('/dashboard/master-data', PanganController::class)->middleware('auth');
+Route::resource('/dashboard/harga-pangan', PanganController::class)->middleware('auth');
 Route::resource('/dashboard/komoditas', KomoditasController::class)->middleware('admin','auth');
 Route::resource('/dashboard/barang', BarangController::class)->middleware('admin','auth');
 Route::resource('/dashboard/pasar', PasarController::class)->middleware('auth');
