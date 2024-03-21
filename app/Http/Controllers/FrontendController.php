@@ -148,11 +148,6 @@ class FrontendController extends Controller
 
 
     
-    public function showkomoditas($slug)
-    {
-    
-        $komoditas = Komoditas::where('slug', $slug)->with('barangs')->firstOrFail();
-        return view('komoditas-show', compact('komoditas'));
-    }
+
 
 }
