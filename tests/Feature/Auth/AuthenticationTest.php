@@ -6,13 +6,13 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Hash; 
 
 
-test('Halaman Login bisa di render', function () {
+test('Halaman Login bisa ditampilkan', function () {
     $response = $this->get('/login');
 
     $response->assertStatus(200);
 });
 
-test('User dapat mengautentikasi dengan validasi dan reCAPTCHA benar', function () {
+test('Pengguna dapat mengautentikasi dengan validasi dan reCAPTCHA benar', function () {
     // Mocking the response from the reCAPTCHA API
     Http::fake([
         'https://www.google.com/recaptcha/api/siteverify' => Http::response(['success' => true]),
@@ -33,7 +33,7 @@ test('User dapat mengautentikasi dengan validasi dan reCAPTCHA benar', function 
     $response->assertRedirect(RouteServiceProvider::HOME);
 });
 
-test('User tidak dapat login dengan respons reCAPTCHA yang tidak valid & password salah', function () {
+test('Pengguna tidak dapat login dengan respon reCAPTCHA yang tidak benar & kata sandi salah', function () {
     // Mocking the response from the reCAPTCHA API
     Http::fake([
         'https://www.google.com/recaptcha/api/siteverify' => Http::response(['success' => false]),

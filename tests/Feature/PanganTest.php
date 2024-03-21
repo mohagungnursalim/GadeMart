@@ -15,14 +15,14 @@ use Tests\TestCase;
 
 
 
-test('Halaman Harga Pangan Dashboard bisa di render', function () {
+test('Halaman harga pangan pada dashboard bisa ditampilkan ', function () {
     
     $response = $this->get('/dashboard/harga-pangan');
 
     $response->assertStatus(302);
 });
 
-test('Harga pangan dapat diinput', function () {
+test('Harga pangan dapat dimasukan ke database', function () {
     $user = User::factory()->create([
       'password' => Hash::make('password'),
     ]);

@@ -5,13 +5,13 @@ use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Notification;
 
-test('reset password link screen can be rendered', function () {
+test('Halaman tautan setel ulang kata sandi dapat ditampilkan', function () {
     $response = $this->get('/forgot-password');
 
     $response->assertStatus(200);
 });
 
-test('reset password link can be requested', function () {
+test('Tautan setel ulang kata sandi dapat diminta', function () {
     Notification::fake();
 
     $user = User::factory()->create([
@@ -23,7 +23,7 @@ test('reset password link can be requested', function () {
     Notification::assertSentTo($user, ResetPassword::class);
 });
 
-test('reset password screen can be rendered', function () {
+test('Halaman atur ulang kata sandi dapat ditampilkan', function () {
     Notification::fake();
 
     $user = User::factory()->create([
@@ -41,7 +41,7 @@ test('reset password screen can be rendered', function () {
     });
 });
 
-test('password can be reset with valid token', function () {
+test('Kata sandi dapat diatur ulang dengan token yang valid', function () {
     Notification::fake();
 
     $user = User::factory()->create([

@@ -8,7 +8,7 @@ use Tests\TestCase;
 
 uses(RefreshDatabase::class);
 
-test('Halaman profil user bisa di render', function () {
+test('Halaman profil pengguna bisa ditampilkan', function () {
     $user = User::factory()->create([
         'password' => Hash::make('password')
     ]);
@@ -18,7 +18,7 @@ test('Halaman profil user bisa di render', function () {
     $response->assertStatus(200);
 });
 
-test('User bisa memperbarui informasi profil', function () {
+test('Pengguna bisa memperbarui informasi profil', function () {
     // Membuat pengguna baru dengan password yang di-hash dan alamat email palsu
     $user = User::factory()->create([
         'password' => Hash::make('password'),

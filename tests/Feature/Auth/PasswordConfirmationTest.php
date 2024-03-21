@@ -3,7 +3,7 @@
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
-test('confirm password screen can be rendered', function () {
+test('Layar konfirmasi kata sandi dapat ditampilkan', function () {
     $user = User::factory()->create([
         'password' => Hash::make('password')
     ]);
@@ -13,7 +13,7 @@ test('confirm password screen can be rendered', function () {
     $response->assertStatus(200);
 });
 
-test('password can be confirmed', function () {
+test('Kata sandi dapat dikonfirmasi', function () {
     $user = User::factory()->create([
         'password' => Hash::make('password')
     ]);
@@ -26,7 +26,7 @@ test('password can be confirmed', function () {
     $response->assertSessionHasNoErrors();
 });
 
-test('password is not confirmed with invalid password', function () {
+test('Kata sandi tidak dikonfirmasi jika kata sandi tidak valid', function () {
     $user = User::factory()->create([
         'password' => Hash::make('password')
     ]);

@@ -3,7 +3,7 @@
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
-test('password can be updated', function () {
+test('Kata sandi dapat diperbarui', function () {
     $user = User::factory()->create([
         'password' => Hash::make('password')
     ]);
@@ -25,7 +25,7 @@ test('password can be updated', function () {
 });
 
 
-test('correct password must be provided to update password', function () {
+test('Kata sandi yang benar harus diberikan untuk memperbarui kata sandi', function () {
     $user = User::factory()->create([
         'password' => Hash::make('password')
     ]);
