@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use App\Exports\AduanExport;
 use Alert;
+use App\Models\Pasar;
 use GuzzleHttp\Client;
 use Maatwebsite\Excel\Facades\Excel;
 class AduanController extends Controller
@@ -18,9 +19,9 @@ class AduanController extends Controller
     public function index()
     {
 
+        $pasars = Pasar::select('nama')->latest()->get();
         
-        
-        return view('aduan');
+        return view('aduan',compact('pasars'));
     }
 
     // dashboard index aduan
