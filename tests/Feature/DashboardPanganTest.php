@@ -18,11 +18,15 @@ use Tests\TestCase;
 
 
 
-test('Halaman harga pangan pada dashboard bisa ditampilkan ', function () {
-    
-    $response = $this->get('/dashboard/harga-pangan');
+test('Halaman Harga Pangan pada dashboard bisa ditampilkan', function () {
+  $user = User::factory()->create([
+      'password' => Hash::make('password'),
+      'is_admin' => true
+  ]);
 
-    $response->assertStatus(302);
+  $response = $this->actingAs($user)->get('/dashboard/harga-pangan');
+
+  $response->assertStatus(200);
 });
 
 test('Filter harga pangan berdasarkan Pasar yang dipilih', function () {
