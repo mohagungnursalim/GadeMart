@@ -4,9 +4,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
 test('Kata sandi dapat diperbarui', function () {
-    $user = User::factory()->create([
-        'password' => Hash::make('password')
-    ]);
+    $user = User::factory()->create();
 
     $response = $this
         ->actingAs($user)
@@ -26,9 +24,7 @@ test('Kata sandi dapat diperbarui', function () {
 
 
 test('Kata sandi yang benar harus diberikan untuk memperbarui kata sandi', function () {
-    $user = User::factory()->create([
-        'password' => Hash::make('password')
-    ]);
+    $user = User::factory()->create();
 
     $response = $this
         ->actingAs($user)
