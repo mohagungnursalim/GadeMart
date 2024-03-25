@@ -4,9 +4,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
 test('Layar konfirmasi kata sandi dapat ditampilkan', function () {
-    $user = User::factory()->create([
-        'password' => Hash::make('password')
-    ]);
+    $user = User::factory()->create();
 
     $response = $this->actingAs($user)->get('/confirm-password');
 
@@ -14,9 +12,7 @@ test('Layar konfirmasi kata sandi dapat ditampilkan', function () {
 });
 
 test('Kata sandi dapat dikonfirmasi', function () {
-    $user = User::factory()->create([
-        'password' => Hash::make('password')
-    ]);
+    $user = User::factory()->create();
 
     $response = $this->actingAs($user)->post('/confirm-password', [
         'password' => 'password',
@@ -27,9 +23,7 @@ test('Kata sandi dapat dikonfirmasi', function () {
 });
 
 test('Kata sandi tidak dikonfirmasi jika kata sandi tidak valid', function () {
-    $user = User::factory()->create([
-        'password' => Hash::make('password')
-    ]);
+    $user = User::factory()->create();
 
     $response = $this->actingAs($user)->post('/confirm-password', [
         'password' => 'wrong-password',
