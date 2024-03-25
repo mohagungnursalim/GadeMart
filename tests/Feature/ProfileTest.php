@@ -9,9 +9,7 @@ use Tests\TestCase;
 uses(RefreshDatabase::class);
 
 test('Halaman profil pengguna bisa ditampilkan', function () {
-    $user = User::factory()->create([
-        'password' => Hash::make('password')
-    ]);
+    $user = User::factory()->create();
 
     $response = $this->actingAs($user)->get('/dashboard/profile');
 
@@ -20,10 +18,7 @@ test('Halaman profil pengguna bisa ditampilkan', function () {
 
 test('Pengguna bisa memperbarui informasi profil', function () {
     // Membuat pengguna baru dengan password yang di-hash dan alamat email palsu
-    $user = User::factory()->create([
-        'password' => Hash::make('password'),
-        'email' => \Faker\Factory::create()->email(),
-    ]);
+    $user = User::factory()->create();
 
     // Mengirim permintaan pembaharuan profil
     $response = $this->actingAs($user)->patch('/dashboard/profile', [
