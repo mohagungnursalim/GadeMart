@@ -5,9 +5,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
 test('Halaman Dashboard Aduan bisa ditampilkan', function () {
-    $user = User::factory()->create([
-        'password' => Hash::make('password')
-    ]);
+    $user = User::factory()->create();
 
     $response = $this->actingAs($user)->get('/dashboard/aduan-masuk');
 
@@ -17,9 +15,7 @@ test('Halaman Dashboard Aduan bisa ditampilkan', function () {
 test('Melakukan pencarian aduan', function () {
 
     // Buat user yang autentikasi
-    $user = User::factory()->create([
-      'password' =>Hash::make('password')
-    ]);
+    $user = User::factory()->create();
   
     // Simulasikan pencarian dengan parameter 'filter'
     $response = $this->actingAs($user)->get('/dashboard/aduan-masuk?search=aduan sampah');
@@ -31,9 +27,7 @@ test('Melakukan pencarian aduan', function () {
 
 test('Aduan masuk dapat dihapus dari database', function () {
 
-    $user = User::factory()->create([
-      'password' => Hash::make('password')
-    ]);
+    $user = User::factory()->create();
 
     // Membuat aduan baru
     $aduan = Aduan::factory()->create();
@@ -50,9 +44,7 @@ test('Aduan masuk dapat dihapus dari database', function () {
 test('Ekspor aduan menjadi file xlsx', function () {
 
   // Membuat pengguna baru dan autentikasi
-  $user = User::factory()->create([
-    'password' => Hash::make('password')
-  ]);
+  $user = User::factory()->create();
   $this->actingAs($user);
 
   // Membuat instance request
