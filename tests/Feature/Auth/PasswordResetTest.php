@@ -14,9 +14,7 @@ test('Halaman tautan setel ulang kata sandi dapat ditampilkan', function () {
 test('Tautan setel ulang kata sandi dapat diminta', function () {
     Notification::fake();
 
-    $user = User::factory()->create([
-        'password' => Hash::make('password')
-    ]);
+    $user = User::factory()->create();
 
     $this->post('/forgot-password', ['email' => $user->email]);
 
@@ -26,9 +24,7 @@ test('Tautan setel ulang kata sandi dapat diminta', function () {
 test('Halaman atur ulang kata sandi dapat ditampilkan', function () {
     Notification::fake();
 
-    $user = User::factory()->create([
-        'password' => Hash::make('password')
-    ]);
+    $user = User::factory()->create();
 
     $this->post('/forgot-password', ['email' => $user->email]);
 
@@ -44,9 +40,7 @@ test('Halaman atur ulang kata sandi dapat ditampilkan', function () {
 test('Kata sandi dapat diatur ulang dengan token yang valid', function () {
     Notification::fake();
 
-    $user = User::factory()->create([
-        'password' => Hash::make('password')
-    ]);
+    $user = User::factory()->create();
 
     $this->post('/forgot-password', ['email' => $user->email]);
 
