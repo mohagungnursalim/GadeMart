@@ -19,9 +19,7 @@ test('Pengguna dapat mengautentikasi dengan validasi dan reCAPTCHA benar', funct
     ]);
 
     // Create a user with a hashed password
-    $user = User::factory()->create([
-        'password' => Hash::make('password'),
-    ]);
+    $user = User::factory()->create();
 
     $response = $this->post('/login', [
         'email' => $user->email,
@@ -40,9 +38,7 @@ test('Pengguna tidak dapat login dengan respon reCAPTCHA yang tidak benar & kata
     ]);
 
     // Create a user with a hashed password
-    $user = User::factory()->create([
-        'password' => Hash::make('password'),
-    ]);
+    $user = User::factory()->create();
 
     $response = $this->post('/login', [
         'email' => $user->email,
