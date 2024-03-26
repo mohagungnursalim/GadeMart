@@ -30,10 +30,10 @@ class tambahAdmin extends Command
         $input['name'] = $this->ask('Masukan nama');
         $input['email'] = $this->ask('Masukan email');
         $input['is_admin'] = $this->ask('Apakah admin? (1/0)') ?? 1;
-        $password = $this->secret('Masukan password') ?? '87654321'; // Gunakan default jika tidak ada input
+        $password = $this->secret('Masukan password') ?? '12345678'; // Gunakan default jika tidak ada input
         $input['password'] = Hash::make($password);
 
         User::create($input);
-        $this->info('Admin telah ditambahkan! password default "87654321" beritahu untuk segera diganti!!');
+        $this->info('Admin telah ditambahkan! password default "12345678" beritahu untuk segera diganti!!');
     }
 }

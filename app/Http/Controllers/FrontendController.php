@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Barang;
 use App\Models\Pasar;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 
 class FrontendController extends Controller
 {
@@ -18,40 +19,47 @@ class FrontendController extends Controller
     public function index(Request $request)
     {
         $query = $request->input('search_query');
-
-        if ($query) {
-            $barangs = Barang::with('pangans')
-                            ->where('nama', 'LIKE', "%$query%")
-                            ->latest()
-                            ->paginate(20);
-        } else {
-            $barangs = Barang::with('pangans')
-                            ->latest()
-                            ->paginate(20);
-        }
-
-        return view('index',compact('barangs'));
+    
+        // Mengecek apakah hasil pencarian sudah ada di cache
+        $cacheKey = 'barangs_' . md5($query);
+        $barangs = Cache::remember($cacheKey, 60, function () use ($query) {
+            if ($query) {
+                return Barang::with('pangans')
+                                ->where('nama', 'LIKE', "%$query%")
+                                ->latest()
+                                ->paginate(20);
+            } else {
+                return Barang::with('pangans')
+                                ->latest()
+                                ->paginate(20);
+            }
+        });
+    
+        return view('index', compact('barangs'));
     }
-
+    
     // Fungsi untuk menangani pencarian barang
     public function search(Request $request)
     {
         $query = $request->input('search_query');
-
-        if ($query) {
-            $barangs = Barang::with('pangans')
-                            ->where('nama', 'LIKE', "%$query%")
-                            ->latest()
-                            ->paginate(20);
-        } else {
-            $barangs = Barang::with('pangans')
-                            ->latest()
-                            ->paginate(20);
-        }
-
+    
+        // Mengecek apakah hasil pencarian sudah ada di cache
+        $cacheKey = 'barangs_' . md5($query);
+        $barangs = Cache::remember($cacheKey, 60, function () use ($query) {
+            if ($query) {
+                return Barang::with('pangans')
+                                ->where('nama', 'LIKE', "%$query%")
+                                ->latest()
+                                ->paginate(20);
+            } else {
+                return Barang::with('pangans')
+                                ->latest()
+                                ->paginate(20);
+            }
+        });
+    
         return view('index', compact('barangs'));
     }
-
     /**
      * Show the form for creating a new resource.
      */
