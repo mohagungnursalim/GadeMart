@@ -13,18 +13,18 @@ test('Halaman Login bisa ditampilkan', function () {
 });
 
 test('Pengguna dapat mengautentikasi dengan validasi dan reCAPTCHA benar', function () {
-    // Mocking the response from the reCAPTCHA API
+    // memalsukan respon dari reCAPTCHA api
     Http::fake([
         'https://www.google.com/recaptcha/api/siteverify' => Http::response(['success' => true]),
     ]);
 
-    // Create a user with a hashed password
+    // Membuat Akun user
     $user = User::factory()->create();
 
     $response = $this->post('/login', [
         'email' => $user->email,
-        'password' => 'password', // Provide the actual password, Laravel will hash it automatically for comparison
-        'g-recaptcha-response' => 'valid-recaptcha-response', // Add a valid reCAPTCHA response
+        'password' => 'password', // Berikan kata sandi sebenarnya, Laravel akan melakukan hash secara otomatis untuk perbandingan
+        'g-recaptcha-response' => 'valid-recaptcha-response', //  valid reCAPTCHA respon
     ]);
 
     $this->assertAuthenticated();
@@ -32,18 +32,18 @@ test('Pengguna dapat mengautentikasi dengan validasi dan reCAPTCHA benar', funct
 });
 
 test('Pengguna tidak dapat login dengan respon reCAPTCHA yang tidak benar & kata sandi salah', function () {
-    // Mocking the response from the reCAPTCHA API
+    // memalsukan respon dari reCAPTCHA api
     Http::fake([
         'https://www.google.com/recaptcha/api/siteverify' => Http::response(['success' => false]),
     ]);
 
-    // Create a user with a hashed password
+    // Membuat Akun user
     $user = User::factory()->create();
 
     $response = $this->post('/login', [
         'email' => $user->email,
-        'password' => 'wrong-password', 
-        'g-recaptcha-response' => 'invalid-recaptcha-response',
+        'password' => 'wrong-password', // memasukan password yang salah
+        'g-recaptcha-response' => 'invalid-recaptcha-response', //memberikan invalid respon
     ]);
 
     $this->assertGuest();
