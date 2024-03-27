@@ -44,9 +44,12 @@ Komoditas
 
 
                 </tr>
+                @php
+                        $startIteration = ($komoditas->currentPage() - 1) * $komoditas->perPage() + 1;
+                @endphp
                 @foreach ($komoditas as $k )
                 <tr>
-                    <td>{{ $loop->iteration }}</td>
+                    <td>{{ $loop->iteration + $startIteration - 1 }}</td>
                     <td>{{ $k->nama }}</td>
                     <td>{{ Carbon\Carbon::parse($k->created_at)->format('d/m/Y') }}</td>
 
