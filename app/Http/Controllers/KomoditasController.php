@@ -18,7 +18,7 @@ class KomoditasController extends Controller
     public function index()
     {
 
-        $komoditas = Komoditas::latest()->paginate(10);
+        $komoditas = Komoditas::oldest()->paginate(10);
        
 
         if (request('search')) {

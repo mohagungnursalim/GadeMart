@@ -18,8 +18,8 @@
     </div>
     <section id="harga" class="harga">
 
+        
         <div class="container">
-
 
             <div class="d-flex justify-content-center">
                 <form action="{{ route('search') }}" method="get">
@@ -36,14 +36,14 @@
                 </form>
             </div>
 
-            <div class="overflow-auto">
+            <div class="overflow-auto d-flex justify-content-center">
                 <div class="col-md-8">
                     <div class="card-body">
 
 
                         <div class="row d-flex flex-wrap">
                             @foreach ($barangs as $barang)
-                            <div class="col-md-3">
+                            <div class="col-md-3 mt-3">
                                 <div class="card">
                                     <img src="{{ asset('storage/' .$barang->image) }}" alt="{{ $barang->nama }}"
                                         class="card-img-top">
@@ -71,7 +71,7 @@
             </div>
 
         </div>
-
+        
 
     </section>
     @endsection

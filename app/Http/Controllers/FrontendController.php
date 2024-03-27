@@ -18,21 +18,13 @@ class FrontendController extends Controller
      */
     public function index(Request $request)
     {
-        $query = $request->input('search_query');
-    
         // Mengecek apakah hasil pencarian sudah ada di cache
-        $cacheKey = 'barangs_' . md5($query);
-        $barangs = Cache::remember($cacheKey, 60, function () use ($query) {
-            if ($query) {
-                return Barang::with('pangans')
-                                ->where('nama', 'LIKE', "%$query%")
-                                ->latest()
-                                ->paginate(20);
-            } else {
-                return Barang::with('pangans')
-                                ->latest()
-                                ->paginate(20);
-            }
+        $cacheKey = 'barangs_index';
+        $barangs = Cache::remember($cacheKey, 60, function () {
+            // Menampilkan semua barang tanpa melakukan pencarian
+            return Barang::with('pangans')
+                            ->oldest()
+                            ->paginate(12);
         });
     
         return view('index', compact('barangs'));
@@ -49,12 +41,12 @@ class FrontendController extends Controller
             if ($query) {
                 return Barang::with('pangans')
                                 ->where('nama', 'LIKE', "%$query%")
-                                ->latest()
-                                ->paginate(20);
+                                ->oldest()
+                                ->paginate(12);
             } else {
                 return Barang::with('pangans')
-                                ->latest()
-                                ->paginate(20);
+                                ->oldest()
+                                ->paginate(12);
             }
         });
     
@@ -119,15 +111,9 @@ class FrontendController extends Controller
     public function komoditas()
     {
 
-        $pasars = Pasar::select('nama')->latest()->get();
-        // $komoditas = Komoditas::with('barangs.pangans')->latest()->get();
+        $pasars = Pasar::select('nama')->oldest()->get();
 
-        // Ambil data komoditas dengan relasi barangs.pangans dan filter berdasarkan "Pasar Inpres Manonda"
-        // $komoditas = Komoditas::with(['barangs.pangans' => function ($query) {
-        //     $query->where('pasar', 'Pasar Inpres Manonda');
-        // }])->latest()->get();
-
-
+        
         // Tentukan pasar yang akan digunakan untuk filter
         $selectedPasar = request('filter');
         
@@ -139,18 +125,14 @@ class FrontendController extends Controller
             // Ambil data komoditas dengan relasi barangs.pangans dan filter berdasarkan pasar yang ditentukan
             $komoditas = Komoditas::with(['barangs.pangans' => function ($query) use ($selectedPasar) {
                 $query->where('pasar', $selectedPasar);
-            }])->latest()->get();
+            }])->oldest()->paginate(10);
         } else {
-        // Ambil data komoditas dengan relasi barangs.pangans dan filter berdasarkan pasar yang ditentukan
-        // $komoditas = Komoditas::with(['barangs.pangans' => function ($query) use ($selectedPasar) {
-        //     $query->where('pasar', $selectedPasar);
-        // }])->latest()->get();
-        $komoditas = Komoditas::with(['barangs.pangans' => function ($query) {
-            $query->where('pasar', 'Pasar Inpres Manonda');
-        }])->latest()->get();
-        
+            $komoditas = Komoditas::with(['barangs.pangans' => function ($query) {
+                $query->where('pasar', 'Pasar Inpres Manonda');
+            }])->oldest()->paginate(10);
         }
 
+        $komoditas->withQueryString();
         return view('komoditas',compact('komoditas','pasars'));
     }
 

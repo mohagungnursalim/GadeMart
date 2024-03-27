@@ -38,17 +38,17 @@ class PanganController extends Controller
                     // Ambil data komoditas dengan relasi barangs.pangans dan filter berdasarkan pasar yang difilter
                     $komoditas = Komoditas::with(['barangs.pangans' => function ($query) use ($selectedPasar) {
                         $query->where('pasar', $selectedPasar);
-                    }])->latest()->get();
+                    }])->oldest()->get();
                 }else {
                      // data harga default yang ditampilkan adalah harga inpres manonda.
                     $komoditas = Komoditas::with(['barangs.pangans' => function ($query) {
                         $query->where('pasar', 'Pasar Inpres Manonda');
-                    }])->latest()->get();
+                    }])->oldest()->get();
                 }
         }else {
                 $komoditas = Komoditas::with(['barangs.pangans' => function ($query) {
                     $query->where('pasar', Auth::user()->operator);
-                }])->latest()->get(); 
+                }])->oldest()->get(); 
         }
 
 

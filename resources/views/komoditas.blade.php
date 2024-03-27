@@ -47,10 +47,12 @@ Komoditas
                         <th class="right">PERUBAHAN (Rp)</th>
                         <th class="right">PERUBAHAN (%)</th>
                     </tr>
-        
+                    @php
+                        $startIteration = ($komoditas->currentPage() - 1) * $komoditas->perPage() + 1;
+                    @endphp
                     @foreach ($komoditas as $kmd)
                     <tr>
-                        <td>{{$loop->iteration}}</td>
+                        <td>{{$loop->iteration + $startIteration - 1}}</td>
                         <td>{{$kmd->nama}}</td>
                         <td></td>
                         <td></td>
@@ -85,13 +87,17 @@ Komoditas
                     </tr>
                     @endif
                     @endforeach
+
                     @endforeach
                     @endforeach
                 </tbody>
             </table>
+            <div class="d-flex justify-content-center">
+                {{-- {{$komoditas->links()}} --}}
+                {{$komoditas->links()}}
+            </div>
         </div>
         
     </div>
-    
     </section>
     @endsection
