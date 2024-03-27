@@ -128,13 +128,18 @@ class PanganController extends Controller
          }
 
         // mencari selisih kenaikan/penurunan dari harga sebelumnya
-        if ($harga_terkini > $harga_sebelum) 
+        if (isset($harga_sebelum)) 
         {
-            $perubahan_rp = $harga_terkini - $harga_sebelum;
-        }elseif ($harga_terkini < $harga_sebelum) 
-        {
-            $perubahan_rp = $harga_sebelum - $harga_terkini;
-        }else{
+            if ($harga_terkini > $harga_sebelum) 
+            {
+                $perubahan_rp = $harga_terkini - $harga_sebelum;
+            }elseif ($harga_terkini < $harga_sebelum) 
+            {
+                $perubahan_rp = $harga_sebelum - $harga_terkini;
+            }else{
+                $perubahan_rp = 0;
+            }
+        }else {
             $perubahan_rp = 0;
         }
         
@@ -212,13 +217,18 @@ class PanganController extends Controller
              }
     
             // mencari selisih kenaikan/penurunan dari harga sebelumnya
-            if ($harga_terkini > $harga_sebelum) 
+            if (isset($harga_sebelum)) 
             {
-                $perubahan_rp = $harga_terkini - $harga_sebelum;
-            }elseif ($harga_terkini < $harga_sebelum) 
-            {
-                $perubahan_rp = $harga_sebelum - $harga_terkini;
-            }else{
+                if ($harga_terkini > $harga_sebelum) 
+                {
+                    $perubahan_rp = $harga_terkini - $harga_sebelum;
+                }elseif ($harga_terkini < $harga_sebelum) 
+                {
+                    $perubahan_rp = $harga_sebelum - $harga_terkini;
+                }else{
+                    $perubahan_rp = 0;
+                }
+            }else {
                 $perubahan_rp = 0;
             }
             
