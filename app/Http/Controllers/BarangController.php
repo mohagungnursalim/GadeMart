@@ -15,10 +15,10 @@ class BarangController extends Controller
     public function index()
     {
 
-        $barangs = Barang::latest()->paginate(10);
-        $komoditas = Komoditas::latest()->get();
+        $barangs = Barang::oldest()->paginate(10);
+        $komoditas = Komoditas::oldest()->get();
         if (request('search')) {
-            $barangs = Barang::where('nama', 'like', '%' . request('search') . '%')->latest()->paginate(10);
+            $barangs = Barang::where('nama', 'like', '%' . request('search') . '%')->oldest()->paginate(10);
         } 
         
         return view('dashboard.barang.index',compact('barangs','komoditas'));
