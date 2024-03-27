@@ -111,29 +111,32 @@ class FrontendController extends Controller
     public function komoditas()
     {
 
-        $pasars = Pasar::select('nama')->oldest()->get();
+        // Mengecek apakah hasil query sudah ada di cache
+        $cacheKey = 'komoditas_' . md5(serialize(request()->all()));
+        $komoditas = Cache::remember($cacheKey, 60, function () {
+            $selectedPasar = request('filter');
+            // Jika filter tidak diberikan, atau jika filter kosong
+            if ($selectedPasar) {
+                // Ambil data komoditas dengan relasi barangs.pangans dan filter berdasarkan pasar yang ditentukan
+                return Komoditas::with(['barangs.pangans' => function ($query) use ($selectedPasar) {
+                    $query->where('pasar', $selectedPasar);
+                }])->oldest()->paginate(10);
+            } else {
+                return Komoditas::with(['barangs.pangans' => function ($query) {
+                    $query->where('pasar', 'Pasar Inpres Manonda');
+                }])->oldest()->paginate(10);
+            }
+        });
 
-        
-        // Tentukan pasar yang akan digunakan untuk filter
-        $selectedPasar = request('filter');
-        
-        // Inisialisasi variabel untuk menyimpan hasil query
-        $komoditas = null;
-
-        // Jika filter tidak diberikan, atau jika filter kosong
-        if ($selectedPasar) {
-            // Ambil data komoditas dengan relasi barangs.pangans dan filter berdasarkan pasar yang ditentukan
-            $komoditas = Komoditas::with(['barangs.pangans' => function ($query) use ($selectedPasar) {
-                $query->where('pasar', $selectedPasar);
-            }])->oldest()->paginate(10);
-        } else {
-            $komoditas = Komoditas::with(['barangs.pangans' => function ($query) {
-                $query->where('pasar', 'Pasar Inpres Manonda');
-            }])->oldest()->paginate(10);
-        }
-
+        // Tambahkan method withQueryString()
         $komoditas->withQueryString();
-        return view('komoditas',compact('komoditas','pasars'));
+
+        $pasars = Cache::remember('pasars', 60, function () {
+            return Pasar::select('nama')->oldest()->get();
+        });
+        
+
+        return view('komoditas', compact('komoditas', 'pasars'));
     }
 
 
